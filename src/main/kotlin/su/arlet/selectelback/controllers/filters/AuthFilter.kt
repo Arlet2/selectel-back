@@ -24,21 +24,7 @@ class AuthFilter @Autowired constructor(private val authService: AuthService) :
             return
         }
 
-//        val jwt: Optional<String> = headersService.getJWTFromHeader(request)
-//
-//        if (jwt.isEmpty()) {
-//            println("No jwt request")
-//
-//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Ошибка авторизации на сервере")
-//            return
-//        }
-//
-//        if (!authService.isJWTValid(jwt.get())) {
-//            println("Request with invalid jwt")
-//
-//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Ошибка авторизации на сервере")
-//            return
-//        }
+        authService.verifyToken(request)
 
         filterChain.doFilter(request, response)
     }
