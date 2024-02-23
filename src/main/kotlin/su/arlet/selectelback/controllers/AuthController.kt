@@ -14,11 +14,14 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import su.arlet.selectelback.exceptions.UnauthorizedError
 import su.arlet.selectelback.services.AuthService
 
 @RestController
 @RequestMapping(value = ["\${api.path}/auth"])
-class AuthController @Autowired constructor(val authService: AuthService){
+class AuthController @Autowired constructor(
+    private val authService: AuthService,
+    ){
 
     data class UserLoginRequest(
         val login: String,
@@ -95,7 +98,11 @@ class AuthController @Autowired constructor(val authService: AuthService){
     )
     @PostMapping(value = ["/register"])
     fun register(@RequestBody(required = true) registerEntity: UserRegisterRequest): ResponseEntity<AuthResponse> {
-        val (accessToken, refreshToken) = authService.register(registerEntity.login, registerEntity.email, registerEntity.password)
+        val (accessToken, refreshToken) = authService.register(
+                registerEntity.login,
+                registerEntity.email,
+                registerEntity.password,
+            )
         return ResponseEntity(AuthResponse(accessToken, refreshToken), HttpStatus.OK)
     }
 
@@ -143,9 +150,19 @@ class AuthController @Autowired constructor(val authService: AuthService){
         ]
     )
     @PostMapping(value = ["/refresh"])
-    fun refresh(request : HttpServletRequest, @RequestBody(required = true, description= "refresh token") refreshToken: String): ResponseEntity<AuthResponse> {
-        val (accessToken, newRefreshToken) = authService.refreshToken(authService.getAccessToken(request), refreshToken)
-        // todo: error handling
+    fun refresh(
+        request : HttpServletRequest,
+        @RequestBody(required = true, description= "refresh token") refreshToken: String,
+        ): ResponseEntity<AuthResponse> {
+        val (accessToken, newRefreshToken) = try {
+            authService.refreshToken(
+                authService.getAccessToken(request),
+                refreshToken
+            )
+        } catch (e: RuntimeException) {
+            throw UnauthorizedError()
+        }
+
         return ResponseEntity(AuthResponse(accessToken, newRefreshToken), HttpStatus.OK)
     }
 }

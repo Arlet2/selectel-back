@@ -1,13 +1,17 @@
 package su.arlet.selectelback.services
 
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
-import io.jsonwebtoken.JwtParser
 import io.jsonwebtoken.Jwts
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import su.arlet.selectelback.core.Tokens
 import su.arlet.selectelback.core.User
+import su.arlet.selectelback.exceptions.IncorrectPasswordError
+import su.arlet.selectelback.exceptions.UnauthorizedError
+import su.arlet.selectelback.exceptions.UserExistsError
+import su.arlet.selectelback.exceptions.UserNotFoundError
 import su.arlet.selectelback.repos.TokenRepo
 import su.arlet.selectelback.repos.UserRepo
 import java.time.Instant
@@ -18,8 +22,8 @@ import java.util.*
 
 @Component
 class AuthService @Autowired constructor (
-    val tokenRepo: TokenRepo,
-    val userRepo : UserRepo,
+    private val tokenRepo: TokenRepo,
+    private val userRepo : UserRepo,
 ) {
     private val key = Jwts.SIG.HS256.key().build() // todo: stable key
 
@@ -33,15 +37,19 @@ class AuthService @Autowired constructor (
     fun getUserID(accessToken: String) : Long {
         val tokenInfo = verifyToken(accessToken)
 
-        return tokenInfo.parseSignedClaims(accessToken).payload.subject.toLong()
+        return tokenInfo.subject.toLong()
     }
 
-    fun verifyToken(token: String) : JwtParser {
+    fun verifyToken(token: String) : Claims {
         try {
-            return Jwts.parser().verifyWith(key).build()
+            return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).payload
         } catch (e: JwtException) {
-            throw RuntimeException()
+            throw UnauthorizedError()
         }
+    }
+
+    fun verifyToken(request : HttpServletRequest) : Claims {
+        return verifyToken(getAccessToken(request))
     }
 
     fun refreshToken(accessToken: String, refreshToken : String): Pair<String, String> {
@@ -53,7 +61,7 @@ class AuthService @Autowired constructor (
         return Pair(createAccessToken(userID), createRefreshToken(userID))
     }
 
-    fun createAccessToken(userID : Long) : String {
+    private fun createAccessToken(userID : Long) : String {
         return Jwts.builder()
             .subject(userID.toString())
             .issuedAt(Date.from(Instant.now()))
@@ -62,7 +70,7 @@ class AuthService @Autowired constructor (
             .compact()
     }
 
-    fun createRefreshToken(userID: Long) : String {
+    private fun createRefreshToken(userID: Long) : String {
         return Jwts.builder()
             .subject(userID.toString())
             .issuedAt(Date.from(Instant.now()))
@@ -77,7 +85,7 @@ class AuthService @Autowired constructor (
 
     fun register(login : String, email : String, password : String) : Pair<String, String> {
         if (userRepo.existsUserByLoginOrEmail(login, email)) {
-            throw RuntimeException("user exists") // todo: change
+            throw UserExistsError()
         }
 
         val entity = userRepo.save(User(
@@ -111,11 +119,11 @@ class AuthService @Autowired constructor (
         } else if (userRepo.existsUserByEmail(loginOrEmail)) {
             userRepo.getUserByEmail(loginOrEmail)
         } else {
-            throw RuntimeException("user is not existed") // todo: change
+            throw UserNotFoundError()
         }
 
         if (hashPassword(password) != user.passwordHash) {
-            throw RuntimeException("incorrectPassport") // todo: change
+            throw IncorrectPasswordError()
         }
 
         val accessToken = createAccessToken(user.id)
