@@ -1,11 +1,9 @@
 version: "3"
 services:
   main-app:
-    #image: arlet2/selectel-back
-    build:
-      dockerfile: ./Dockerfile
+    image: arlet2/selectel-back
     ports:
-      - "9000:8080"
+      - "127.0.0.1:9000:8080"
     env_file:
       - .env
 
@@ -21,4 +19,9 @@ services:
     env_file:
       - .env
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "127.0.0.1:${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:
