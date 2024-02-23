@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -19,6 +20,7 @@ import su.arlet.selectelback.services.AuthService
 
 @RestController
 @RequestMapping(value = ["\${api.path}/auth"])
+@Tag(name = "Auth API")
 class AuthController @Autowired constructor(
     private val authService: AuthService,
     ){
