@@ -1,6 +1,5 @@
 package su.arlet.selectelback.core
 
-import jakarta.annotation.Generated
 import jakarta.persistence.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -12,21 +11,20 @@ class User (
     val id: Long = 0,
     val login : String,
     val email : String,
-    val phone : String? = null,
-    val surname: String? = null,
-    val name : String? = null,
-    val lastName: String? = null,
-    val passwordHash: String,
+    var phone : String? = null,
+    var surname: String? = null,
+    var name : String? = null,
+    var lastName: String? = null,
+    var passwordHash: String,
     val created: LocalDate,
-    val lastActive: LocalDateTime,
+    var lastActive: LocalDateTime,
 
     @ManyToOne
     @JoinColumn(name = "locationId")
-    val location: Location? = null,
+    var location: Location? = null,
 
-    val district: String? = null,
-    val avatar: String? = null, // link
-    val vkUserName: String? = null,
-    val telegramName: String? = null,
-    val vkToken: String? = null,
+    var avatar: String? = null, // link
+    var vkUserName: String? = null,
+    var tgUserName: String? = null,
+    val vkUserId: String? = null,
 )

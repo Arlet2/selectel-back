@@ -25,7 +25,7 @@ import java.time.LocalDate
 
 
 @RestController
-@RequestMapping("/pets")
+@RequestMapping("\${api.path}/pets")
 @Tag(name = "Pet API")
 class PetController @Autowired constructor(
     private val petRepo: PetRepo,
