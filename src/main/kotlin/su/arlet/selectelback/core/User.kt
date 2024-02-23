@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "users")
 class User (
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     val id: Long = 0,
     val login : String,
     val email : String,

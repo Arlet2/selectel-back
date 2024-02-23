@@ -4,15 +4,18 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
+import lombok.EqualsAndHashCode
+import lombok.Getter
+import lombok.Setter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import su.arlet.selectelback.exceptions.UnauthorizedError
@@ -35,10 +38,13 @@ class AuthController @Autowired constructor(
         val refreshToken: String,
     )
 
-    data class UserRegisterRequest(
-        val login: String,
-        val password: String,
-        val email: String,
+    @Setter
+    @Getter
+    @EqualsAndHashCode
+    class UserRegisterRequest(
+        var login: String,
+        var password: String,
+        var email: String,
     )
 
     data class UserExistsError(
@@ -99,7 +105,8 @@ class AuthController @Autowired constructor(
         ]
     )
     @PostMapping(value = ["/register"])
-    fun register(@RequestBody(required = true) registerEntity: UserRegisterRequest): ResponseEntity<AuthResponse> {
+    fun register(@RequestBody registerEntity: UserRegisterRequest): ResponseEntity<AuthResponse> {
+        println(registerEntity.toString())
         val (accessToken, refreshToken) = authService.register(
                 registerEntity.login,
                 registerEntity.email,
@@ -116,7 +123,7 @@ class AuthController @Autowired constructor(
                 content = arrayOf()
             ),
             ApiResponse(
-                responseCode = "401", description = "Unauthorized", content = arrayOf()
+                responseCode = "401", description = "Unauthorized", content = arrayOf(Content())
             ),
             ApiResponse(
                 responseCode = "500", description = "Internal error", content = arrayOf(Content()),
@@ -144,7 +151,7 @@ class AuthController @Autowired constructor(
                 )
             ),
             ApiResponse(
-                responseCode = "401", description = "Unauthorized", content = arrayOf()
+                responseCode = "401", description = "Unauthorized", content = arrayOf(Content())
             ),
             ApiResponse(
                 responseCode = "500", description = "Internal error", content = arrayOf(Content()),
@@ -154,7 +161,7 @@ class AuthController @Autowired constructor(
     @PostMapping(value = ["/refresh"])
     fun refresh(
         request : HttpServletRequest,
-        @RequestBody(required = true, description= "refresh token") refreshToken: String,
+        @RequestBody(required = true) refreshToken: String,
         ): ResponseEntity<AuthResponse> {
         val (accessToken, newRefreshToken) = try {
             authService.refreshToken(

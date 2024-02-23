@@ -126,6 +126,9 @@ class AuthService @Autowired constructor (
             throw IncorrectPasswordError()
         }
 
+        if (user.id == null)
+            throw RuntimeException("id is null!")
+
         val accessToken = createAccessToken(user.id)
         val refreshToken = createRefreshToken(user.id)
 
