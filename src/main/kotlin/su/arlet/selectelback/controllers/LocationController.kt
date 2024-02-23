@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import su.arlet.selectelback.core.Location
 import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.*
 
@@ -26,7 +27,7 @@ class LocationController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun getCities(): List<String> {
-        return locationRepo.findCities() ?: throw EntityNotFoundException("cities")
+        return locationRepo.findCities()
     }
 
     @GetMapping("/districts")
@@ -37,7 +38,7 @@ class LocationController @Autowired constructor(
     @ApiResponse(responseCode = "404", description = "City not found", content = [Content()])
     fun getDistricts(
         @RequestParam(name = "city", required = true) city: String?
-    ): ResponseEntity<*> {
+    ): ResponseEntity<List<Location>> {
         if (city == null) return ResponseEntity(null, HttpStatus.NOT_FOUND)
         val districts = locationRepo.findByCity(city) ?: throw EntityNotFoundException("city")
         return ResponseEntity.ok(districts)

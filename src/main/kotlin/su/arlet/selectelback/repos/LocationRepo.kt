@@ -6,6 +6,6 @@ import su.arlet.selectelback.core.Location
 
 interface LocationRepo : JpaRepository<Location, Long> {
     @Query("SELECT DISTINCT l.city FROM Location l")
-    fun findCities(): List<String>?
+    fun findCities(): List<String>
     fun findByCity(city: String): List<Location>?
 }

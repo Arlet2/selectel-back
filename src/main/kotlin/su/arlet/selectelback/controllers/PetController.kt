@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 import su.arlet.selectelback.controllers.filters.RangeFilter
 import su.arlet.selectelback.controllers.responses.EntityCreatedResponse
 import su.arlet.selectelback.core.BloodType
+import su.arlet.selectelback.core.Location
 import su.arlet.selectelback.core.Pet
 import su.arlet.selectelback.core.PetType
 import su.arlet.selectelback.exceptions.BadEntityException
@@ -74,6 +75,52 @@ class PetController @Autowired constructor(
         }
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get pet by ID")
+    @ApiResponse(responseCode = "200", description = "Success - found pet")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    @ApiResponse(responseCode = "404", description = "Not found - pet not found", content = [Content()])
+    fun getPetById(@PathVariable id: Long): ResponseEntity<Pet> {
+        val pet = petRepo.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
+        return ResponseEntity.ok(pet)
+    }
+
+    @GetMapping("/types")
+    @Operation(summary = "Get all pet types")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    fun getCities(): List<String> {
+        return petTypeRepo.findTypes()
+    }
+
+    @GetMapping("/breeds")
+    @Operation(summary = "Get all pet types")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    fun getBreeds(
+        @RequestParam(name = "typeName", required = true) typeName: String?,
+    ): ResponseEntity<List<PetType>> {
+        if (typeName == null) return ResponseEntity(null, HttpStatus.NOT_FOUND)
+        val breeds = petTypeRepo.findByType(typeName) ?: throw EntityNotFoundException("type")
+        return ResponseEntity.ok(breeds)
+    }
+
+    @GetMapping("/blood_types")
+    @Operation(summary = "Get all pet types")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    fun getBloodTypes(
+        @RequestParam(name = "typeName", required = true) typeName: String?,
+    ): ResponseEntity<List<BloodType>> {
+        if (typeName == null) return ResponseEntity(null, HttpStatus.NOT_FOUND)
+        val bloodTypes = bloodTypeRepo.findByTypeName(typeName) ?: throw EntityNotFoundException("type")
+        return ResponseEntity.ok(bloodTypes)
+    }
+
     @PostMapping("/")
     @Operation(summary = "Create a new pet")
     @ApiResponse(responseCode = "201", description = "Added", content = [
@@ -109,17 +156,6 @@ class PetController @Autowired constructor(
         } catch (_: IllegalArgumentException) {
             throw BadEntityException("Entity was empty")
         }
-    }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "Get pet by ID")
-    @ApiResponse(responseCode = "200", description = "Success - found pet")
-    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
-    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
-    @ApiResponse(responseCode = "404", description = "Not found - pet not found", content = [Content()])
-    fun getPetById(@PathVariable id: Long): ResponseEntity<Pet> {
-        val pet = petRepo.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
-        return ResponseEntity.ok(pet)
     }
 
     @PatchMapping("/{id}")
