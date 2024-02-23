@@ -14,7 +14,7 @@ class User (
     var phone : String? = null,
     var surname: String? = null,
     var name : String? = null,
-    var lastName: String? = null,
+    var middleName: String? = null,
     var passwordHash: String,
     val created: LocalDate,
     var lastActive: LocalDateTime,

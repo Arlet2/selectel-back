@@ -2,20 +2,15 @@ package su.arlet.selectelback.controllers
 
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
 import su.arlet.selectelback.controllers.filters.RangeFilter
-import su.arlet.selectelback.controllers.responses.EntityCreatedResponse
 import su.arlet.selectelback.core.*
-import su.arlet.selectelback.exceptions.BadEntityException
 import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.BloodTypeRepo
 import su.arlet.selectelback.repos.UserRepo
@@ -62,7 +57,7 @@ class UserController @Autowired constructor(
         updatedUser.phone?.let { user.phone = it }
         updatedUser.surname?.let { user.surname = it }
         updatedUser.name?.let { user.name = it }
-        updatedUser.lastName?.let { user.lastName = it }
+        updatedUser.lastName?.let { user.middleName = it }
         updatedUser.password?.let { user.passwordHash = authService.hashPassword(it) }
         // updatedUser.locationId?.let { user.location =  }
         updatedUser.vkUserName?.let { user.vkUserName = it }

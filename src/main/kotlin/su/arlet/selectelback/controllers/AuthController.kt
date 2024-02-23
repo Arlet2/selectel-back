@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import su.arlet.selectelback.exceptions.UnauthorizedError
+import su.arlet.selectelback.exceptions.UserExistsError
 import su.arlet.selectelback.services.AuthService
 
 @RestController
@@ -45,10 +46,6 @@ class AuthController @Autowired constructor(
         var login: String,
         var password: String,
         var email: String,
-    )
-
-    data class UserExistsError(
-        val field: String
     )
 
     @Operation(summary = "Login user")
@@ -92,10 +89,6 @@ class AuthController @Autowired constructor(
                     Content(
                         mediaType = "application/json",
                                 schema =Schema(implementation = UserExistsError::class),
-                        examples = arrayOf(
-                            ExampleObject(value = "{ field: \"email\" }", name = "Email exists"),
-                            ExampleObject(value = "{ field: \"login\" }", name = "Login exists")
-                            )
                     ),
                 )
             ),
@@ -105,13 +98,19 @@ class AuthController @Autowired constructor(
         ]
     )
     @PostMapping(value = ["/register"])
-    fun register(@RequestBody registerEntity: UserRegisterRequest): ResponseEntity<AuthResponse> {
+    fun register(@RequestBody registerEntity: UserRegisterRequest): ResponseEntity<*> {
         println(registerEntity.toString())
-        val (accessToken, refreshToken) = authService.register(
+
+        val (accessToken, refreshToken) = try {
+            authService.register(
                 registerEntity.login,
                 registerEntity.email,
                 registerEntity.password,
             )
+        } catch (e : UserExistsError) {
+            data class Error(val error: String)
+            return ResponseEntity(Error(error = "email или логин уже существует"), HttpStatus.CONFLICT)
+        }
         return ResponseEntity(AuthResponse(accessToken, refreshToken), HttpStatus.OK)
     }
 

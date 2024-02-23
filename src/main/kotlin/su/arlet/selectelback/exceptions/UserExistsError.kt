@@ -5,5 +5,4 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 
 @ResponseStatus(value = HttpStatus.CONFLICT)
-class UserExistsError : RuntimeException() {
-}
+class UserExistsError : RuntimeException()
