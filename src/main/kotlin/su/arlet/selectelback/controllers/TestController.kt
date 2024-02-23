@@ -26,6 +26,9 @@ class TestController {
                 )
             ),
             ApiResponse(
+                responseCode = "401", description = "Where are you token?", content = arrayOf(Content())
+            ),
+            ApiResponse(
                 responseCode = "404", description = "No such delivery was found", content = arrayOf(Content())
             ),
             ApiResponse(
