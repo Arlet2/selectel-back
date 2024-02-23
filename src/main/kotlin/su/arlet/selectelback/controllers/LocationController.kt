@@ -26,7 +26,7 @@ class LocationController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun getCities(): List<String> {
-        return locationRepo.findDistinctCity()
+        return locationRepo.findCities() ?: throw EntityNotFoundException("cities")
     }
 
     @GetMapping("/districts")
@@ -39,7 +39,7 @@ class LocationController @Autowired constructor(
         @RequestParam(name = "city", required = true) city: String?
     ): ResponseEntity<*> {
         if (city == null) return ResponseEntity(null, HttpStatus.NOT_FOUND)
-        val districts = locationRepo.findByCity(city) ?: throw EntityNotFoundException("user")
+        val districts = locationRepo.findByCity(city) ?: throw EntityNotFoundException("city")
         return ResponseEntity.ok(districts)
     }
 }
