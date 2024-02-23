@@ -9,24 +9,24 @@ import java.time.LocalDateTime
 @Table(name = "users")
 class User (
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int,
+    val id: Long = 0,
     val login : String,
     val email : String,
-    val phone : String,
-    val surname: String,
-    val name : String,
-    val lastName: String,
+    val phone : String? = null,
+    val surname: String? = null,
+    val name : String? = null,
+    val lastName: String? = null,
     val passwordHash: String,
     val created: LocalDate,
     val lastActive: LocalDateTime,
 
     @ManyToOne
     @JoinColumn(name = "locationId")
-    val location: Location?,
+    val location: Location? = null,
 
-    val district: String,
-    val avatar: String, // link
-    val vkUserName: String,
-    val telegramName: String,
-    val vkToken: String?,
+    val district: String? = null,
+    val avatar: String? = null, // link
+    val vkUserName: String? = null,
+    val telegramName: String? = null,
+    val vkToken: String? = null,
 )

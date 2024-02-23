@@ -1,21 +1,24 @@
 package su.arlet.selectelback.controllers
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import jakarta.servlet.http.HttpServletRequest
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import su.arlet.selectelback.services.AuthService
 
 @RestController
 @RequestMapping(value = ["\${api.path}/auth"])
-class AuthController {
+class AuthController @Autowired constructor(val authService: AuthService){
 
     data class UserLoginRequest(
         val login: String,
@@ -55,8 +58,9 @@ class AuthController {
         ]
     )
     @PostMapping(value = ["/login"])
-    fun login(loginEntity: UserLoginRequest): ResponseEntity<AuthResponse> {
-        return ResponseEntity(AuthResponse("", ""), HttpStatus.OK)
+    fun login(@RequestBody(required = true) loginEntity: UserLoginRequest): ResponseEntity<AuthResponse> {
+        val (accessToken, refreshToken) = authService.login(loginEntity.login, loginEntity.password)
+        return ResponseEntity(AuthResponse(accessToken, refreshToken), HttpStatus.OK)
     }
 
     @Operation(summary = "Register user")
@@ -78,7 +82,7 @@ class AuthController {
                         mediaType = "application/json",
                                 schema =Schema(implementation = UserExistsError::class),
                         examples = arrayOf(
-                            ExampleObject(value = "{ field: d\"email\" }", name = "Email exists"),
+                            ExampleObject(value = "{ field: \"email\" }", name = "Email exists"),
                             ExampleObject(value = "{ field: \"login\" }", name = "Login exists")
                             )
                     ),
@@ -90,11 +94,34 @@ class AuthController {
         ]
     )
     @PostMapping(value = ["/register"])
-    fun register(registerEntity: UserRegisterRequest): ResponseEntity<AuthResponse> {
-        return ResponseEntity(AuthResponse("", ""), HttpStatus.OK)
+    fun register(@RequestBody(required = true) registerEntity: UserRegisterRequest): ResponseEntity<AuthResponse> {
+        val (accessToken, refreshToken) = authService.register(registerEntity.login, registerEntity.email, registerEntity.password)
+        return ResponseEntity(AuthResponse(accessToken, refreshToken), HttpStatus.OK)
     }
 
     @Operation(summary = "Logout user")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Success logout",
+                content = arrayOf()
+            ),
+            ApiResponse(
+                responseCode = "401", description = "Unauthorized", content = arrayOf()
+            ),
+            ApiResponse(
+                responseCode = "500", description = "Internal error", content = arrayOf(Content()),
+            )
+        ]
+    )
+    @PostMapping(value = ["/logout"])
+    fun logout(request: HttpServletRequest): ResponseEntity<*> {
+        val userID = authService.getUserID(request)
+        authService.removeTokens(userID)
+        return ResponseEntity(null, HttpStatus.OK)
+    }
+
+    @Operation(summary = "Refresh tokens")
     @ApiResponses(
         value = [
             ApiResponse(
@@ -115,8 +142,10 @@ class AuthController {
             )
         ]
     )
-    @PostMapping(value = ["/logout"])
-    fun logout(): ResponseEntity<*> {
-        return ResponseEntity(null, HttpStatus.OK)
+    @PostMapping(value = ["/refresh"])
+    fun refresh(request : HttpServletRequest, @RequestBody(required = true, description= "refresh token") refreshToken: String): ResponseEntity<AuthResponse> {
+        val (accessToken, newRefreshToken) = authService.refreshToken(authService.getAccessToken(request), refreshToken)
+        // todo: error handling
+        return ResponseEntity(AuthResponse(accessToken, newRefreshToken), HttpStatus.OK)
     }
 }

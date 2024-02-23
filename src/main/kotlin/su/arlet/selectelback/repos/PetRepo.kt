@@ -3,4 +3,4 @@ package su.arlet.selectelback.repos
 import org.springframework.data.jpa.repository.JpaRepository
 import su.arlet.selectelback.core.Pet
 
-interface PetRepository : JpaRepository<Pet, Long> {}
+interface PetRepo : JpaRepository<Pet, Long> {}

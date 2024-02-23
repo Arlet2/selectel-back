@@ -17,10 +17,10 @@ import su.arlet.selectelback.core.Pet
 import su.arlet.selectelback.core.PetType
 import su.arlet.selectelback.exceptions.BadEntityException
 import su.arlet.selectelback.exceptions.EntityNotFoundException
-import su.arlet.selectelback.repos.BloodTypeRepository
-import su.arlet.selectelback.repos.PetRepository
-import su.arlet.selectelback.repos.PetTypeRepository
-import su.arlet.selectelback.repos.UserRepository
+import su.arlet.selectelback.repos.BloodTypeRepo
+import su.arlet.selectelback.repos.PetRepo
+import su.arlet.selectelback.repos.PetTypeRepo
+import su.arlet.selectelback.repos.UserRepo
 import java.time.LocalDate
 
 
@@ -28,10 +28,10 @@ import java.time.LocalDate
 @RequestMapping("/pets")
 @Tag(name = "Pet API")
 class PetController @Autowired constructor(
-    private val petRepository: PetRepository,
-    private val userRepository: UserRepository,
-    private val petTypeRepository: PetTypeRepository,
-    private val bloodTypeRepository: BloodTypeRepository,
+    private val petRepo: PetRepo,
+    private val userRepo: UserRepo,
+    private val petTypeRepo: PetTypeRepo,
+    private val bloodTypeRepo: BloodTypeRepo,
     private val rangeFilter: RangeFilter
 ) {
 
@@ -50,7 +50,7 @@ class PetController @Autowired constructor(
         @RequestParam(name = "bloodTypeId", required = false) bloodTypeId: Long?,
         @RequestParam(name = "bloodType", required = false) bloodType: String?,
     ): List<Pet> {
-        return petRepository.findAll().toList().filter {
+        return petRepo.findAll().toList().filter {
             if (!rangeFilter.equal(it.owner.location?.id, locationId))
                 return@filter false
             if (!rangeFilter.equal(it.owner.location?.city, city))
@@ -87,16 +87,16 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "404", description = "Not found (incorrect ids)", content = [Content()])
     fun createPet(@RequestBody petRequest: CreatePetRequest, request: HttpServletRequest): ResponseEntity<*> {
         try {
-            val createdEntity = petRepository.save(
+            val createdEntity = petRepo.save(
                 Pet(
                     owner = petRequest.ownerId.let {
-                        userRepository.findById(it).orElseThrow{ throw EntityNotFoundException("user") }
+                        userRepo.findById(it).orElseThrow{ throw EntityNotFoundException("user") }
                     },
                     petType = petRequest.petTypeId.let {
-                        petTypeRepository.findById(it).orElseThrow { throw EntityNotFoundException("pet type") }
+                        petTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("pet type") }
                     },
                     bloodType = petRequest.bloodTypeId.let {
-                        bloodTypeRepository.findById(it).orElseThrow { throw EntityNotFoundException("blood type") }
+                        bloodTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("blood type") }
                     },
                     name = petRequest.name,
                     description = petRequest.description,
@@ -118,7 +118,7 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - pet not found", content = [Content()])
     fun getPetById(@PathVariable id: Long): ResponseEntity<Pet> {
-        val pet = petRepository.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
+        val pet = petRepo.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
         return ResponseEntity.ok(pet)
     }
 
@@ -129,9 +129,9 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - pet not found", content = [Content()])
     fun updatePet(@PathVariable id: Long, @RequestBody updatedPet: UpdatePetRequest): ResponseEntity<*> {
-        val pet = petRepository.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
+        val pet = petRepo.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
         updatePetFields(pet, updatedPet)
-        return ResponseEntity.ok(petRepository.save(pet))
+        return ResponseEntity.ok(petRepo.save(pet))
     }
 
     @DeleteMapping("/{id}")
@@ -141,9 +141,9 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun deletePet(@PathVariable id: Long): ResponseEntity<Void> {
-        val pet = petRepository.findById(id)
+        val pet = petRepo.findById(id)
         return if (pet.isPresent) {
-            petRepository.delete(pet.get())
+            petRepo.delete(pet.get())
             ResponseEntity.ok().build()
         } else {
             ResponseEntity.noContent().build()
