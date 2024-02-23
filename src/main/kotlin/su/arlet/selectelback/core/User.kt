@@ -27,4 +27,7 @@ class User (
     var vkUserName: String? = null,
     var tgUserName: String? = null,
     val vkUserId: String? = null,
+
+    var emailVisibility: Boolean = true,
+    var phoneVisibility: Boolean = true
 )

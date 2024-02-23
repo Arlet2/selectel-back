@@ -13,6 +13,7 @@ import su.arlet.selectelback.controllers.filters.RangeFilter
 import su.arlet.selectelback.core.*
 import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.BloodTypeRepo
+import su.arlet.selectelback.repos.LocationRepo
 import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.services.AuthService
 
@@ -23,8 +24,7 @@ import su.arlet.selectelback.services.AuthService
 @Tag(name = "Users API")
 class UserController @Autowired constructor(
     private val userRepository: UserRepo,
-    private val bloodTypeRepository: BloodTypeRepo,
-    private val rangeFilter: RangeFilter,
+    private val locationRepository: LocationRepo,
     private val authService: AuthService
 ) {
 
@@ -59,9 +59,13 @@ class UserController @Autowired constructor(
         updatedUser.name?.let { user.name = it }
         updatedUser.lastName?.let { user.middleName = it }
         updatedUser.password?.let { user.passwordHash = authService.hashPassword(it) }
-        // updatedUser.locationId?.let { user.location =  }
+        updatedUser.locationId?.let {
+            user.location = locationRepository.findById(it).orElseThrow { throw EntityNotFoundException("location") }
+        }
         updatedUser.vkUserName?.let { user.vkUserName = it }
         updatedUser.tgUserName?.let { user.tgUserName = it }
+        updatedUser.emailViability?.let { user.emailVisibility = it }
+        updatedUser.phoneViability?.let { user.phoneVisibility = it }
     }
 
     data class UpdateUserRequest (
@@ -72,6 +76,8 @@ class UserController @Autowired constructor(
         val password: String?,
         val locationId: Long?,
         val vkUserName: String?,
-        val tgUserName: String?
+        val tgUserName: String?,
+        val emailViability: Boolean?,
+        val phoneViability: Boolean?
     )
 }
