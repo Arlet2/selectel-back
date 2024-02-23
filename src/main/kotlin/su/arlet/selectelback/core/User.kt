@@ -19,7 +19,11 @@ class User (
     val passwordHash: String,
     val created: LocalDate,
     val lastActive: LocalDateTime,
-    val city: String,
+
+    @ManyToOne
+    @JoinColumn(name = "locationId")
+    val location: Location?,
+
     val district: String,
     val avatar: String, // link
     val vkUserName: String,
