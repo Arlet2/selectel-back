@@ -1,6 +1,7 @@
 package su.arlet.selectelback.controllers.filters
 
 import org.springframework.stereotype.Component
+
 @Component
 class RangeFilter {
     fun <T : Comparable<T>> inRange(value: T?, greater: T?, greaterEq: T?, less: T?, lessEq: T?, eq: T?): Boolean {

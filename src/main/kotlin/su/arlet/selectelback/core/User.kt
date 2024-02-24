@@ -6,14 +6,14 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "users")
-class User (
+class User(
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     val id: Long = 0,
-    val login : String,
-    val email : String? = null,
-    var phone : String? = null,
+    val login: String,
+    val email: String? = null,
+    var phone: String? = null,
     var surname: String? = null,
-    var name : String? = null,
+    var name: String? = null,
     var middleName: String? = null,
     var passwordHash: String? = null,
     val created: LocalDate,

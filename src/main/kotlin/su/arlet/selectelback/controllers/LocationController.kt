@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import su.arlet.selectelback.core.Location
 import su.arlet.selectelback.exceptions.EntityNotFoundException
-import su.arlet.selectelback.repos.*
+import su.arlet.selectelback.repos.LocationRepo
 
 @RestController
 @RequestMapping("\${api.path}/location")

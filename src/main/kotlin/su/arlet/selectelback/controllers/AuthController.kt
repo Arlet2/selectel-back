@@ -2,7 +2,6 @@ package su.arlet.selectelback.controllers
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -24,12 +23,9 @@ import su.arlet.selectelback.exceptions.IncorrectPasswordError
 import su.arlet.selectelback.exceptions.UnauthorizedError
 import su.arlet.selectelback.exceptions.UserExistsError
 import su.arlet.selectelback.repos.UserRepo
+import su.arlet.selectelback.exceptions.UserNotFoundError
 import su.arlet.selectelback.services.AuthService
 import su.arlet.selectelback.services.PostRequestService
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -77,7 +73,6 @@ class AuthController @Autowired constructor(
                 )
             ),
             ApiResponse(
-
                 responseCode = "500", description = "Internal error", content = arrayOf(Content()),
             )
         ]
@@ -86,7 +81,9 @@ class AuthController @Autowired constructor(
     fun login(@RequestBody(required = true) loginEntity: UserLoginRequest): ResponseEntity<*> {
         val (accessToken, refreshToken) = try {
             authService.login(loginEntity.login, loginEntity.password)
-        } catch (e : IncorrectPasswordError) {
+        } catch (e: IncorrectPasswordError) {
+            return ResponseEntity(Error(error = "неправильный логин или пароль"), HttpStatus.CONFLICT)
+        } catch (e: UserNotFoundError) {
             return ResponseEntity(Error(error = "неправильный логин или пароль"), HttpStatus.CONFLICT)
         }
         return ResponseEntity(AuthResponse(accessToken, refreshToken), HttpStatus.OK)
@@ -101,7 +98,7 @@ class AuthController @Autowired constructor(
                     Content(
                         mediaType = "application/json",
 
-                        schema =Schema(implementation = AuthResponse::class)
+                        schema = Schema(implementation = AuthResponse::class)
                     ),
                 )
             ),
@@ -109,7 +106,7 @@ class AuthController @Autowired constructor(
                 responseCode = "409", description = "Login/email exists", content = arrayOf(
                     Content(
                         mediaType = "application/json",
-                                schema =Schema(implementation = UserExistsError::class),
+                        schema = Schema(implementation = UserExistsError::class),
                     ),
                 )
             ),
@@ -128,7 +125,7 @@ class AuthController @Autowired constructor(
                 registerEntity.email,
                 registerEntity.password,
             )
-        } catch (e : UserExistsError) {
+        } catch (e: UserExistsError) {
             data class Error(val error: String)
             return ResponseEntity(Error(error = "email или логин уже существует"), HttpStatus.CONFLICT)
         }
@@ -166,7 +163,7 @@ class AuthController @Autowired constructor(
                     Content(
                         mediaType = "application/json",
 
-                        schema =Schema(implementation = AuthResponse::class)
+                        schema = Schema(implementation = AuthResponse::class)
                     ),
                 )
             ),
@@ -180,9 +177,9 @@ class AuthController @Autowired constructor(
     )
     @PostMapping(value = ["/refresh"])
     fun refresh(
-        request : HttpServletRequest,
+        request: HttpServletRequest,
         @RequestBody(required = true) refreshToken: String,
-        ): ResponseEntity<AuthResponse> {
+    ): ResponseEntity<AuthResponse> {
         val (accessToken, newRefreshToken) = try {
             authService.refreshToken(
                 authService.getAccessToken(request),

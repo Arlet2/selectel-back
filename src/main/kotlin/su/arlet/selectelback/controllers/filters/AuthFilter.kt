@@ -27,7 +27,7 @@ class AuthFilter(private val authService: AuthService) : Filter {
 
         try {
             authService.verifyToken(request)
-        } catch (e : Exception) {
+        } catch (e: Exception) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
         }
 

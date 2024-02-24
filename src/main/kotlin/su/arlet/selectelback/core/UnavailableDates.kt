@@ -3,13 +3,13 @@ package su.arlet.selectelback.core
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.LocalDate
 
 @Entity
-@Table(name = "tokens")
-class Tokens(
+@Table(name = "unavailable_dates")
+class UnavailableDates(
     @Id
     val userID: Long,
-
-    val accessToken: String,
-    val refreshToken: String,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
 )

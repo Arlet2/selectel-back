@@ -1,25 +1,25 @@
 package su.arlet.selectelback.controllers
 
-import io.swagger.v3.oas.annotations.*
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
+import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.*
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import su.arlet.selectelback.controllers.filters.RangeFilter
+import org.springframework.web.multipart.MultipartFile
 import su.arlet.selectelback.controllers.responses.PetResponse
 import su.arlet.selectelback.controllers.responses.UserResponse
-import su.arlet.selectelback.core.*
+import su.arlet.selectelback.core.User
 import su.arlet.selectelback.exceptions.EntityNotFoundException
-import su.arlet.selectelback.repos.BloodTypeRepo
 import su.arlet.selectelback.repos.LocationRepo
 import su.arlet.selectelback.repos.PetRepo
 import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.services.AuthService
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -44,7 +44,7 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
     fun getCurrentUser(request: HttpServletRequest): ResponseEntity<UserResponse> {
         val id: Long = authService.getUserID(request)
-        val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
+        val user = userRepository.findById(id).orElseThrow { throw EntityNotFoundException("user") }
         return ResponseEntity.ok(UserResponse(user))
     }
 
@@ -87,14 +87,14 @@ class UserController @Autowired constructor(
         request: HttpServletRequest
     ): ResponseEntity<UserResponse> {
         val id: Long = authService.getUserID(request)
-        val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
+        val user = userRepository.findById(id).orElseThrow { throw EntityNotFoundException("user") }
         updateUserFields(user, updatedUser)
         userRepository.save(user)
 
         return ResponseEntity.ok(UserResponse(user))
     }
 
-    @PostMapping("/changePass")
+    @PostMapping("/change_password")
     @Operation(summary = "Change password")
     @ApiResponse(responseCode = "200", description = "Success - password changed")
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
@@ -105,7 +105,7 @@ class UserController @Autowired constructor(
         request: HttpServletRequest
     ): ResponseEntity<*> {
         val id: Long = authService.getUserID(request)
-        val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
+        val user = userRepository.findById(id).orElseThrow { throw EntityNotFoundException("user") }
 
         return if (
                 user.passwordHash == null ||
@@ -132,10 +132,37 @@ class UserController @Autowired constructor(
         updatedUser.phoneVisibility?.let { user.phoneVisibility = it }
     }
 
-    data class UpdateUserRequest (
-        val phone : String?,
+    @PostMapping("/avatar")
+    @Operation(summary = "Upload avatar")
+    @ApiResponse(responseCode = "200", description = "Success - avatar uploaded")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
+    fun uploadAvatarFile(@RequestParam file: MultipartFile): Any? {
+        val resJsonData = JSONObject()
+        try {
+            if (file.isEmpty) {
+                println("Empty")
+            }
+
+            Files.copy(file.inputStream, p.resolve(file.originalFilename))
+
+            resJsonData.put("status", 200)
+            resJsonData.put("message", "Success!")
+            resJsonData.put("data", file.originalFilename)
+        } catch (e: Exception) {
+            println(e.message)
+            resJsonData.put("status", 400)
+            resJsonData.put("message", "Upload Image Error!")
+            resJsonData.put("data", "")
+        }
+        return resJsonData.toString()
+    }
+
+    data class UpdateUserRequest(
+        val phone: String?,
         val surname: String?,
-        val name : String?,
+        val name: String?,
         val lastName: String?,
         val locationId: Long?,
         val vkUserName: String?,
@@ -144,7 +171,7 @@ class UserController @Autowired constructor(
         val phoneVisibility: Boolean?
     )
 
-    data class UpdatePasswordRequest (
+    data class UpdatePasswordRequest(
         val oldPassword: String,
         val newPassword: String
     )
