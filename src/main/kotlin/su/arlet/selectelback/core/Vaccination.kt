@@ -1,6 +1,7 @@
 package su.arlet.selectelback.core
 
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
@@ -18,6 +19,7 @@ data class Vaccination(
     @JoinColumn(name = "petId")
     var pet: Pet,
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     var vaccinationDate: LocalDate,
     var name: String,
     var description: String?

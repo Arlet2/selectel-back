@@ -1,5 +1,6 @@
 package su.arlet.selectelback.core
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -16,7 +17,9 @@ class User(
     var name: String? = null,
     var middleName: String? = null,
     var passwordHash: String? = null,
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     val created: LocalDate,
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     var lastActive: LocalDateTime,
 
     @ManyToOne
