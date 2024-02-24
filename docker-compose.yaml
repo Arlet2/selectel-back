@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     volumes:
-      - static:/var/lib/server/static
+      - /usr/share/static:/static
 
   watchtower:
     image: containrrr/watchtower

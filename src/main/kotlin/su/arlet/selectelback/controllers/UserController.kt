@@ -165,8 +165,10 @@ class UserController @Autowired constructor(
             if (extension == null) {
                 return ResponseEntity("no extension on file", HttpStatus.BAD_REQUEST)
             }
+
+            val filename = imageService.hashFilename(file.name) + extension
             val path =
-                Path(staticFilesPath.pathString, imageService.hashFilename(file.name) + extension).toAbsolutePath()
+                Path(staticFilesPath.pathString, filename).toAbsolutePath()
 
             // todo: if file exists
             Files.copy(file.inputStream, path)
@@ -175,7 +177,7 @@ class UserController @Autowired constructor(
             resJsonData.put("message", "Success!")
             resJsonData.put("link", path.toAbsolutePath())
 
-            user.avatar = path.pathString
+            user.avatar = "https://petdonor.ru/avatar/"+filename
             userRepository.save(user)
         } catch (e: Exception) {
             println(e)
