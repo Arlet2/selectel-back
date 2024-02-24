@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
+import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import su.arlet.selectelback.controllers.responses.PetResponse
 import su.arlet.selectelback.controllers.responses.UserResponse
 import su.arlet.selectelback.core.*
@@ -16,6 +18,7 @@ import su.arlet.selectelback.repos.LocationRepo
 import su.arlet.selectelback.repos.PetRepo
 import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.services.AuthService
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
