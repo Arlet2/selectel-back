@@ -219,6 +219,8 @@ class AuthController @Autowired constructor(
                 )
             } catch (_: IllegalStateException) { null }
 
+            println("Get user Info: $userInfo")
+
             val location: Location? = userInfo?.let {
                 try {
                     val city = it.getJSONObject("city").getString("title")

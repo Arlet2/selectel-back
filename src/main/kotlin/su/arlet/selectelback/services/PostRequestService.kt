@@ -45,6 +45,8 @@ class PostRequestService(private val restTemplate: RestTemplate) {
 
         val responseEntity = restTemplate.exchange(VK_GET_INFO_URL, HttpMethod.POST, requestEntity, String::class.java)
 
+        println("Get response from vk: ${responseEntity.body}")
+
         val response = JSONObject(responseEntity.body ?: throw IllegalStateException("Empty response body"))
 
         if (!response.has("response"))
@@ -54,6 +56,8 @@ class PostRequestService(private val restTemplate: RestTemplate) {
 
         if (arr.length() == 0)
             throw IllegalStateException("Response data not found, messsage from VK: $response")
+
+        println("Get user arr: $arr")
 
         return arr.getJSONObject(0)
     }
