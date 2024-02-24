@@ -14,7 +14,8 @@ data class Vaccination(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @ManyToOne(cascade = [CascadeType.REMOVE])
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "petId")
     var pet: Pet,
 
