@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.persistence.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -13,8 +14,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException.BadRequest
 import su.arlet.selectelback.controllers.filters.RangeFilter
 import su.arlet.selectelback.controllers.responses.EntityCreatedResponse
-import su.arlet.selectelback.core.BloodType
-import su.arlet.selectelback.core.DonorRequest
+import su.arlet.selectelback.core.*
 import su.arlet.selectelback.exceptions.BadEntityException
 import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.BloodTypeRepo
@@ -36,6 +36,17 @@ class DonorRequestController @Autowired constructor (
     private val petTypeRepo: PetTypeRepo,
     private val bloodTypeRepo: BloodTypeRepo,
 ){
+
+    data class DonorRequestPresenter (
+        var id: Long,
+        var location: Location?,
+        var description: String,
+        var vetAddress: String,
+        var petType: PetType,
+        var bloodType: BloodType,
+        var bloodAmountMl : Double,
+        var availableUntil: LocalDate?,
+    )
 
     @GetMapping("/")
     @Operation(summary = "Get all donor requests")
@@ -78,6 +89,17 @@ class DonorRequestController @Autowired constructor (
                 return@filter false
 
             return@filter true
+        }.map {
+            return@map DonorRequestPresenter(
+                id = it.id,
+                location = it.user.location,
+                description = it.description,
+                vetAddress = it.vetAddress,
+                petType = it.petType,
+                bloodType = it.bloodType,
+                bloodAmountMl = it.bloodAmountMl,
+                availableUntil = it.availableUntil,
+            )
         }
 
         return ResponseEntity(donorRequests, HttpStatus.OK)

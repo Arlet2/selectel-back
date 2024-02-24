@@ -134,7 +134,7 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    fun uploadAvatarFile(@RequestBody file: MultipartFile): Any? {
+    fun uploadAvatarFile(@RequestParam file: MultipartFile): Any? {
         val resJsonData = JSONObject()
         try {
             if (file.isEmpty) {
