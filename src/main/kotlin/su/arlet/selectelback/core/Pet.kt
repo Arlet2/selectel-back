@@ -31,5 +31,5 @@ data class Pet(
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     var birthday: LocalDate?,
     var weight: Double?,
-    var avatar: String,
+    var avatar: String = "https://petdonor.ru/avatar/default-avatar-pet.jpg",
 )

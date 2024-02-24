@@ -26,7 +26,7 @@ class User(
     @JoinColumn(name = "locationId")
     var location: Location? = null,
 
-    var avatar: String? = null, // link
+    var avatar: String? = "https://petdonor.ru/avatar/default-avatar-user.jpg", // link
     var vkUserName: String? = null,
     var tgUserName: String? = null,
     val vkUserId: String? = null,

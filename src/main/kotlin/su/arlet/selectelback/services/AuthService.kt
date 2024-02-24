@@ -103,7 +103,6 @@ class AuthService @Autowired constructor(
                 login = login,
                 passwordHash = hashPassword(password),
                 lastActive = LocalDateTime.now(),
-                avatar = defaultUserAvatarURL,
             )
         )
 

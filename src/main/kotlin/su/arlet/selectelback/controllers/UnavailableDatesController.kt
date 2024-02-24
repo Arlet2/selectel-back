@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -17,6 +18,7 @@ import java.time.LocalDate
 
 @RestController
 @RequestMapping("\${api.path}/users/unavailable_dates")
+@Tag(name = "Unavailable Dates API")
 class UnavailableDatesController @Autowired constructor(
     val authService: AuthService,
     val unavailableDatesRepo: UnavailableDatesRepo,

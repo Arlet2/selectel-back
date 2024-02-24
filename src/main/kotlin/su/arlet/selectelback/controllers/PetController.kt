@@ -25,7 +25,6 @@ import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.*
 import su.arlet.selectelback.services.AuthService
 import su.arlet.selectelback.services.ImageService
-import su.arlet.selectelback.services.defaultPetAvatarURL
 import su.arlet.selectelback.services.staticFilesPath
 import java.nio.file.Files
 import java.time.LocalDate
@@ -196,7 +195,6 @@ class PetController @Autowired constructor(
                     description = petRequest.description,
                     birthday = petRequest.birthday,
                     weight = petRequest.weight,
-                    avatar = defaultPetAvatarURL,
                 )
             )
 
