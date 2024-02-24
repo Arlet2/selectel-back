@@ -46,8 +46,18 @@ class UnavailableDatesController @Autowired constructor(
         val userID = authService.getUserID(request)
 
         val unavailableDates = unavailableDatesRepo.findById(userID)
-        if (unavailableDates.isPresent)
+        if (unavailableDates.isPresent) {
+            if (unavailableDates.get().endDate!!.isBefore(LocalDate.now())) {
+                return ResponseEntity(
+                    UnavailableDates(
+                        userID = userID,
+                        startDate = null,
+                        endDate = null,
+                    ), HttpStatus.OK
+                )
+            }
             return ResponseEntity(unavailableDates, HttpStatus.OK)
+        }
 
         return ResponseEntity(
             UnavailableDates(
@@ -91,24 +101,6 @@ class UnavailableDatesController @Autowired constructor(
         }
     }
 
-    @PatchMapping("/")
-    @Operation(summary = "Update unavailable dates")
-    @ApiResponse(responseCode = "200", description = "Success - updated unavailable dates")
-    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
-    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
-    @ApiResponse(responseCode = "404", description = "Not found - donor request not found", content = [Content()])
-    fun updateUnavailableDates(
-        request: HttpServletRequest,
-        @RequestBody unavailableDatesUpdateRequest: UnavailableDatesUpdateRequest,
-    ): ResponseEntity<*> {
-        val userID = authService.getUserID(request)
-
-        val unavailableDates =
-            unavailableDatesRepo.findById(userID).orElseThrow { throw EntityNotFoundException("unavailable dates") }
-        updateUnavailableDates(unavailableDates, unavailableDatesUpdateRequest)
-        return ResponseEntity.ok(unavailableDatesRepo.save(unavailableDates))
-    }
-
     @DeleteMapping("/")
     @Operation(summary = "Delete unavailable")
     @ApiResponse(responseCode = "200", description = "Success - deleted unavailable dates")
@@ -127,14 +119,6 @@ class UnavailableDatesController @Autowired constructor(
         } else {
             ResponseEntity.noContent().build()
         }
-    }
-
-    private fun updateUnavailableDates(
-        unavailableDates: UnavailableDates,
-        updateRequest: UnavailableDatesUpdateRequest,
-    ) {
-        updateRequest.startDate?.let { unavailableDates.startDate = it }
-        updateRequest.endDate?.let { unavailableDates.endDate = it }
     }
 
 }
