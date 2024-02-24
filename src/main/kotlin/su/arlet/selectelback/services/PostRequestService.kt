@@ -16,9 +16,9 @@ class PostRequestService(private val restTemplate: RestTemplate) {
 
     fun sendVkPostRequest(token: String, uuid: String): JSONObject {
         val headers = HttpHeaders()
-        headers.contentType = MediaType.MULTIPART_FORM_DATA
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
-        val requestBody = "v=5.131&token=${token}&access_token=${ACCESS_TOKEN}&uuid=${uuid}\""
+        val requestBody = "v=5.131&token=${token}&access_token=${ACCESS_TOKEN}&uuid=${uuid}"
         val requestEntity = HttpEntity(requestBody, headers)
 
         println("Send request: ${requestEntity.body}")
