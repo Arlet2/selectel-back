@@ -28,7 +28,7 @@ class User(
     var tgUserName: String? = null,
     val vkUserId: String? = null,
 
-    var isPasswordSet: Boolean? = true,
-    var emailVisibility: Boolean? = true,
-    var phoneVisibility: Boolean? = true
+    var isPasswordSet: Boolean = true,
+    var emailVisibility: Boolean = true,
+    var phoneVisibility: Boolean = true
 )

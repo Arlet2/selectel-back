@@ -17,9 +17,9 @@ class UserResponse(
     var avatar: String? = null,
     var vkUserName: String? = null,
     var tgUserName: String? = null,
-    var isPasswordSet: Boolean? = null,
-    var emailVisibility: Boolean? = null,
-    var phoneVisibility: Boolean? = null
+    var isPasswordSet: Boolean = true,
+    var emailVisibility: Boolean = true,
+    var phoneVisibility: Boolean = true
 ) {
     constructor(user: User) : this(
         user.id,

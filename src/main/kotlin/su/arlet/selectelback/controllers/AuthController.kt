@@ -27,6 +27,7 @@ import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.exceptions.UserNotFoundError
 import su.arlet.selectelback.services.AuthService
 import su.arlet.selectelback.services.PostRequestService
+import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -199,12 +200,13 @@ class AuthController @Autowired constructor(
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun loginVk(@RequestBody(required = true) vkAuthRequest: VkAuthRequest): ResponseEntity<*> {
         // todo try catch
-        val response = postRequestService.sendVkPostRequest(
-            token = vkAuthRequest.token, uuid = vkAuthRequest.uuid
-        )
-
-        if (!response.has("user_id"))
+        val response = try {
+            postRequestService.sendVkPostRequest(
+                token = vkAuthRequest.token, uuid = vkAuthRequest.uuid
+            )
+        } catch (_: IllegalStateException) {
             return ResponseEntity("Invalid token", HttpStatus.UNAUTHORIZED)
+        }
 
         val vkUserId: String = response["user_id"].toString()
 
