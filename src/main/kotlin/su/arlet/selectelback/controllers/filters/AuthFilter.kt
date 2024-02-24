@@ -1,18 +1,13 @@
 package su.arlet.selectelback.controllers.filters
 
-import jakarta.servlet.FilterChain
-import jakarta.servlet.ServletRequest
-import jakarta.servlet.ServletResponse
+import jakarta.servlet.*
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
-import org.springframework.web.filter.GenericFilterBean
-import su.arlet.selectelback.exceptions.UnauthorizedError
 import su.arlet.selectelback.services.AuthService
 
-class AuthFilter constructor(private val authService: AuthService) :
-    GenericFilterBean() {
+class AuthFilter(private val authService: AuthService) : Filter {
+
+    override fun init(filterConfig: FilterConfig?) {}
 
     override fun doFilter(
         servletRequest: ServletRequest,
@@ -25,15 +20,28 @@ class AuthFilter constructor(private val authService: AuthService) :
         if (request.method == "OPTIONS") {
             filterChain.doFilter(request, response)
             return
+        } else if (excludeUrl(request.requestURI)) {
+            filterChain.doFilter(servletRequest, servletResponse)
+            return
         }
 
         try {
             authService.verifyToken(request)
         } catch (e : Exception) {
-            println(e)
-            throw UnauthorizedError()
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
         }
 
         filterChain.doFilter(request, response)
     }
+
+    override fun destroy() {}
+
+    private fun excludeUrl(requestUri: String): Boolean {
+        // Define the URLs that should be excluded from filtering
+        // Return true if the URL should be excluded, false otherwise
+        return requestUri.startsWith("/back/api/v1/auth/")
+                || requestUri.startsWith("/swagger")
+                || requestUri.startsWith("/docs")
+    }
+
 }

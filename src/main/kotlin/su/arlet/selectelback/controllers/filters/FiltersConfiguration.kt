@@ -9,7 +9,6 @@ import su.arlet.selectelback.services.AuthService
 @Configuration
 class FiltersConfiguration {
 
-    /*
     @Autowired
     @Bean
     fun createAuthFilter(
@@ -18,11 +17,8 @@ class FiltersConfiguration {
         val filter: FilterRegistrationBean<AuthFilter> = FilterRegistrationBean<AuthFilter>()
 
         filter.filter = AuthFilter(authService)
-
-        //filter.addUrlPatterns("*")
+        filter.addUrlPatterns("/*")
 
         return filter
     }
-
-     */
 }
