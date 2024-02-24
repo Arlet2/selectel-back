@@ -77,7 +77,7 @@ class DonorRequestController @Autowired constructor(
                 } else if (isMyRequests != null && it.user.id == userID) {
                     return@filter false
                 }
-            }*/
+            }
 
             if (dateBefore?.isBefore(it.availableUntil) != true)
                 return@filter false
@@ -93,6 +93,8 @@ class DonorRequestController @Autowired constructor(
 
             if (!rangeFilter.equal(it.bloodType.id, bloodTypeID))
                 return@filter false
+
+             */
 
             return@filter true
         }.map {
