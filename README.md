@@ -1,20 +1,44 @@
 [![ci](https://github.com/Arlet2/selectel-back/actions/workflows/main.yml/badge.svg)](https://github.com/Arlet2/selectel-back/actions/workflows/main.yml)
 
-# Pet Donor
-### Version 1.0
+# Добряки © 2024
+## Сделано для Selectel Hack 2024
 
-## Links
-○
-* ### [Link on site](https://petdonor.ru)
-### ○ [Link on API documentation](https://api.petdonor.ru/swagger)
-### ○ [Link on frontend](https://github.com/Arlet2/selectel-front)
-## Deploy
+[petdonor.ru](https://petdonor.ru) - **Наш проект предназачен для связи доноров-животных и их хозяев с теми, кто нуждается в донации**
 
-### Requirements:
+## На нашем сайте вы можете:
+
+- Зарегистрироваться/войти (также доступен вход с помощью ВК ID)
+- Добавить личную информацию в профиль, скрыть или показать телефон и почту, добавить социальные сети
+- Загрузить фотографию на аватарку
+- Добавить даты недоступности (например, если вы уезжаете в отпуск или заболели)
+- Добавить питомцев, а также для каждого питомца можно добавить список прививок
+- Подать заявку на донацию
+- Просмотреть свои и чужие заявки на донацию. Заявки на донацию можно фильтровать по нескольким категориям: тип животного, группа крови, город, район, начальная и конечная дата поиска
+- Просмотреть список доноров (список всех животных, а также информация о их хозяевах). Доноров можно фильтровать по нескольким категориям: тип животного, группа крови, город и район.
+- Перейти на страницу хозяина по клику на карточку донора в поиске
+- Просмотреть подробную информацию про других животных
+
+## Технологии:
+- Kotlin
+- Spring Boot
+- Postgres
+- Docker
+- docker-compose
+
+## Полезные ссылки
+
+* ### [Сайт](https://petdonor.ru)
+* ### [API документация](https://api.petdonor.ru/swagger)
+* ### [Frontend](https://github.com/Arlet2/selectel-front)
+
+## Развёртывание
+
+### Зависимости:
 * #### git
 * #### Docker
 * #### docker-compose
-### To run app:
+
+### Для запуска приложения на сервере:
 ```shell script
 # Clone project
 $ git clone https://github.com/Arlet2/selectel-back.git
