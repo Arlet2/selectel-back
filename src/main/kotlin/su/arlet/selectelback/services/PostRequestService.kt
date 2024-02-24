@@ -18,6 +18,7 @@ class PostRequestService(private val restTemplate: RestTemplate) {
         val requestEntity = HttpEntity(requestBody, headers)
         val responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String::class.java)
 
+        println("Get response from VK: ${responseEntity.body}")
 
         return JSONObject(responseEntity.body ?: throw IllegalStateException("Empty response body"))
     }
