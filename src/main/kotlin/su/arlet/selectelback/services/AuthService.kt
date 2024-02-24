@@ -4,6 +4,8 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.io.Decoders
+import io.jsonwebtoken.security.Keys
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -29,7 +31,7 @@ class AuthService @Autowired constructor(
     private val userRepo: UserRepo,
 ) {
     private val PASSWORD_HASH_COST = 12
-    private val key = Jwts.SIG.HS256.key().random(SecureRandom(byteArrayOf(2, 2, 8))).build()
+    private val key = Keys.hmacShaKeyFor(Decoders.BASE64.decode("qwerty1234567@aA"));
 
     fun getAccessToken(request: HttpServletRequest): String {
         return request.getHeader("Authorization").replace("bearer ", "", true) // todo: fix it

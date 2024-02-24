@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import java.util.List
 
 
 @SecurityScheme(
@@ -31,8 +30,17 @@ class WebConfig : WebMvcConfigurer {
 
     @Bean
     fun customOpenAPI(): OpenAPI {
-        val server = Server()
-        server.url = "https://api.petdonor.ru/"
-        return OpenAPI().servers(listOf(server))
+        val urls = arrayOf("https://api.petdonor.ru", "http://localhost:8080")
+        val servers = mutableListOf<Server>()
+
+        var server : Server
+        for (url in urls) {
+            server = Server()
+            server.url = url
+            servers.add(server)
+        }
+
+
+        return OpenAPI().servers(servers)
     }
 }

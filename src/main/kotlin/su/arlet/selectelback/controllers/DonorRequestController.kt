@@ -60,6 +60,7 @@ class DonorRequestController @Autowired constructor(
         @RequestParam(name = "date_before", required = false) dateBefore: LocalDate?,
         @RequestParam(name = "date_after", required = false) dateAfter: LocalDate?,
         @RequestParam(name = "location_id", required = false) locationID: Long?,
+        @RequestParam(name = "city", required = false) city: String?,
         @RequestParam(name = "pet_type_id", required = false) petTypeID: Long?,
         @RequestParam(name = "blood_type_id", required = false) bloodTypeID: Long?,
     ): ResponseEntity<*> {
@@ -97,6 +98,9 @@ class DonorRequestController @Autowired constructor(
                 return@filter false
 
             if (!rangeFilter.equal(it.bloodType.id, bloodTypeID))
+                return@filter false
+
+            if (!rangeFilter.equal(it.user.location?.city, city))
                 return@filter false
 
             return@filter true
