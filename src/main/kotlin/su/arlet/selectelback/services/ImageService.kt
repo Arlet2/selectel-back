@@ -2,6 +2,7 @@ package su.arlet.selectelback.services
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Component
+import java.util.Base64
 
 @Component
 class ImageService {
@@ -9,6 +10,6 @@ class ImageService {
 
 
     fun hashFilename(fileName: String): String {
-        return BCrypt.withDefaults().hashToString(HASH_COST, fileName.toCharArray())
+        return Base64.getEncoder().encodeToString(BCrypt.withDefaults().hashToString(HASH_COST, fileName.toCharArray()).toByteArray())
     }
 }

@@ -148,7 +148,6 @@ class UserController @Autowired constructor(
         @RequestParam("file") file: MultipartFile,
         ): Any? {
         val userID: Long = authService.getUserID(request)
-
         val user = userRepository.findById(userID).get()
 
         val resJsonData = JSONObject()
@@ -159,6 +158,7 @@ class UserController @Autowired constructor(
 
             val path = Path(staticFilesPath.pathString, imageService.hashFilename(file.name)).toAbsolutePath()
 
+            // todo: if file exists
             Files.copy(file.inputStream, path)
 
             resJsonData.put("status", 200)
