@@ -91,10 +91,10 @@ class AuthService @Autowired constructor (
         }
 
         val entity = userRepo.save(User(
-               created = LocalDate.now(),
+            created = LocalDate.now(),
             email = email,
             login = login,
-            passwordHash = password,
+            passwordHash = hashPassword(password),
             lastActive = LocalDateTime.now(),
         ))
 
