@@ -13,7 +13,7 @@ class PostRequestService(private val restTemplate: RestTemplate) {
 
     fun sendPostRequest(url: String, requestBody: Any): JSONObject {
         val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
+        headers.contentType = MediaType.MULTIPART_FORM_DATA
 
         val requestEntity = HttpEntity(JSONObject(requestBody).toString(), headers)
 
