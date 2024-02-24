@@ -3,7 +3,6 @@ package su.arlet.selectelback.controllers
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
@@ -12,6 +11,7 @@ import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
 import su.arlet.selectelback.controllers.filters.RangeFilter
 import su.arlet.selectelback.controllers.responses.EntityCreatedResponse
+import su.arlet.selectelback.controllers.responses.PetResponse
 import su.arlet.selectelback.core.*
 import su.arlet.selectelback.exceptions.BadEntityException
 import su.arlet.selectelback.exceptions.EntityNotFoundException
@@ -45,7 +45,7 @@ class PetController @Autowired constructor(
         @RequestParam(name = "petBreed", required = false) petBreed: String?,
         @RequestParam(name = "bloodTypeId", required = false) bloodTypeId: Long?,
         @RequestParam(name = "bloodType", required = false) bloodType: String?,
-    ): List<Pet> {
+    ): List<PetResponse> {
         return petRepo.findAll().toList().filter {
             if (!rangeFilter.equal(it.owner.location?.id, locationId))
                 return@filter false
@@ -67,7 +67,7 @@ class PetController @Autowired constructor(
                 return@filter false
 
             return@filter true
-        }
+        }.map { PetResponse(it) }
     }
 
     @GetMapping("/{id}")
@@ -76,9 +76,9 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - pet not found", content = [Content()])
-    fun getPetById(@PathVariable id: Long): ResponseEntity<Pet> {
+    fun getPetById(@PathVariable id: Long): ResponseEntity<PetResponse> {
         val pet = petRepo.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
-        return ResponseEntity.ok(pet)
+        return ResponseEntity.ok(PetResponse(pet))
     }
 
     @GetMapping("/{id}/vaccinations")
@@ -140,7 +140,7 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found (incorrect ids)", content = [Content()])
-    fun createPet(@RequestBody petRequest: CreatePetRequest, request: HttpServletRequest): ResponseEntity<*> {
+    fun createPet(@RequestBody petRequest: CreatePetRequest, request: HttpServletRequest): ResponseEntity<EntityCreatedResponse> {
         try {
             val createdEntity = petRepo.save(
                 Pet(
@@ -179,7 +179,7 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "404", description = "Not found", content = [Content()])
     fun createVaccination(
         @PathVariable id: Long, @RequestBody vaccinationRequest: CreateVaccinationRequest
-    ): ResponseEntity<*> {
+    ): ResponseEntity<EntityCreatedResponse> {
         try {
             val createdEntity = vaccinationsRepo.save(
                 Vaccination(
@@ -202,10 +202,11 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - pet not found", content = [Content()])
-    fun updatePet(@PathVariable id: Long, @RequestBody updatedPet: UpdatePetRequest): ResponseEntity<*> {
+    fun updatePet(@PathVariable id: Long, @RequestBody updatedPet: UpdatePetRequest): ResponseEntity<PetResponse> {
         val pet = petRepo.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
         updatePetFields(pet, updatedPet)
-        return ResponseEntity.ok(petRepo.save(pet))
+        petRepo.save(pet)
+        return ResponseEntity.ok(PetResponse(pet))
     }
 
     @PatchMapping("/{id}/vaccination/{vaccinationId}")

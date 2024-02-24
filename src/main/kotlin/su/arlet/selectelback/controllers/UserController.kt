@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
 import su.arlet.selectelback.controllers.filters.RangeFilter
+import su.arlet.selectelback.controllers.responses.UserResponse
 import su.arlet.selectelback.core.*
 import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.BloodTypeRepo
@@ -35,10 +36,10 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    fun getCurrentUsers(request: HttpServletRequest): ResponseEntity<User> {
+    fun getCurrentUser(request: HttpServletRequest): ResponseEntity<UserResponse> {
         val id: Long = authService.getUserID(request)
         val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
-        return ResponseEntity.ok(user)
+        return ResponseEntity.ok(UserResponse(user))
     }
 
     @GetMapping("/{login}")
@@ -47,10 +48,10 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    fun getUserByLogin(@PathVariable login: String): ResponseEntity<User> {
+    fun getUserByLogin(@PathVariable login: String): ResponseEntity<UserResponse> {
         return if (userRepository.existsUserByLogin(login)) {
             val user = userRepository.getUserByLogin(login)
-            ResponseEntity.ok(user)
+            ResponseEntity.ok(UserResponse(user))
         } else ResponseEntity.notFound().build()
     }
 
@@ -60,11 +61,16 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    fun updateUser(@RequestBody updatedUser: UpdateUserRequest, request: HttpServletRequest): ResponseEntity<*> {
+    fun updateUser(
+        @RequestBody updatedUser: UpdateUserRequest,
+        request: HttpServletRequest
+    ): ResponseEntity<UserResponse> {
         val id: Long = authService.getUserID(request)
         val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
         updateUserFields(user, updatedUser)
-        return ResponseEntity.ok(userRepository.save(user))
+        userRepository.save(user)
+
+        return ResponseEntity.ok(UserResponse(user))
     }
 
     @PostMapping("/changePass")
