@@ -199,7 +199,6 @@ class AuthController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "Wrong token given", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun loginVk(@RequestBody(required = true) vkAuthRequest: VkAuthRequest): ResponseEntity<*> {
-        // todo try catch
         val response = try {
             postRequestService.sendVkPostRequest(
                 token = vkAuthRequest.token, uuid = vkAuthRequest.uuid

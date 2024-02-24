@@ -31,6 +31,6 @@ class PostRequestService(private val restTemplate: RestTemplate) {
         if (!response.has("response"))
             throw IllegalStateException("Response data not found, messsage from VK: ${response["error"]}")
 
-        return JSONObject(response["response"])
+        return JSONObject(response["response"].toString())
     }
 }
