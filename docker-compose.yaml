@@ -6,6 +6,8 @@ services:
       - "127.0.0.1:9000:8080"
     env_file:
       - .env
+    volumes:
+      - static:/var/lib/server/static
 
   watchtower:
     image: containrrr/watchtower
@@ -25,3 +27,4 @@ services:
 
 volumes:
   postgres:
+  main-app:
