@@ -229,9 +229,9 @@ class AuthController @Autowired constructor(
     fun getVkAuthInfo(vkAuthRequest: VkAuthRequest) : Map<String, String> {
         val accessToken = "983ca070983ca070983ca070519b2bff159983c983ca070fde428633e93e2d7d7ded22d"
         return mapOf(
-            vkAuthRequest.token to "token",
-            vkAuthRequest.uuid to "uuid",
-            accessToken to "access_token"
+            "token" to vkAuthRequest.token,
+            "uuid" to vkAuthRequest.uuid,
+            "access_token" to accessToken
         )
     }
 
