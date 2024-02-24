@@ -34,13 +34,9 @@ class PostRequestService(private val restTemplate: RestTemplate) {
 
     fun getUserInfo(userToken: String, vkUserId: String): JSONObject {
         val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
-        val requestBody = "{" +
-                "\"access_token\": \"$userToken\", " +
-                "\"user_ids\": \"$vkUserId\", " +
-                "\"fields\": \"city\"" +
-                "}"
+        val requestBody = "access_token=${userToken}&user_ids=${vkUserId}&fields=city"
         val requestEntity = HttpEntity(requestBody, headers)
 
         val responseEntity = restTemplate.exchange(VK_GET_INFO_URL, HttpMethod.POST, requestEntity, String::class.java)
