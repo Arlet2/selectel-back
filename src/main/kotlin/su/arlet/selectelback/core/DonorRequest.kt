@@ -4,8 +4,8 @@ import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
-@Table(name="donor_requests")
-class DonorRequest (
+@Table(name = "donor_requests")
+class DonorRequest(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
@@ -19,6 +19,6 @@ class DonorRequest (
     @ManyToOne
     @JoinColumn(name = "blood_type_id")
     var bloodType: BloodType,
-    var bloodAmountMl : Double,
+    var bloodAmountMl: Double,
     var availableUntil: LocalDate?,
-    )
+)

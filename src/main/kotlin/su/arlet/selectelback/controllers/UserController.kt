@@ -1,18 +1,19 @@
 package su.arlet.selectelback.controllers
 
-import io.swagger.v3.oas.annotations.*
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.*
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import su.arlet.selectelback.controllers.responses.PetResponse
 import su.arlet.selectelback.controllers.responses.UserResponse
-import su.arlet.selectelback.core.*
+import su.arlet.selectelback.core.User
 import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.LocationRepo
 import su.arlet.selectelback.repos.PetRepo
@@ -43,7 +44,7 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
     fun getCurrentUser(request: HttpServletRequest): ResponseEntity<UserResponse> {
         val id: Long = authService.getUserID(request)
-        val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
+        val user = userRepository.findById(id).orElseThrow { throw EntityNotFoundException("user") }
         return ResponseEntity.ok(UserResponse(user))
     }
 
@@ -86,7 +87,7 @@ class UserController @Autowired constructor(
         request: HttpServletRequest
     ): ResponseEntity<UserResponse> {
         val id: Long = authService.getUserID(request)
-        val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
+        val user = userRepository.findById(id).orElseThrow { throw EntityNotFoundException("user") }
         updateUserFields(user, updatedUser)
         userRepository.save(user)
 
@@ -104,7 +105,7 @@ class UserController @Autowired constructor(
         request: HttpServletRequest
     ): ResponseEntity<*> {
         val id: Long = authService.getUserID(request)
-        val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
+        val user = userRepository.findById(id).orElseThrow { throw EntityNotFoundException("user") }
 
         return if (authService.passwordsEquals(updatePass.oldPassword, user.passwordHash)) {
             user.passwordHash = authService.hashPassword(updatePass.newPassword)
@@ -154,10 +155,11 @@ class UserController @Autowired constructor(
         }
         return resJsonData.toString()
     }
-    data class UpdateUserRequest (
-        val phone : String?,
+
+    data class UpdateUserRequest(
+        val phone: String?,
         val surname: String?,
-        val name : String?,
+        val name: String?,
         val lastName: String?,
         val locationId: Long?,
         val vkUserName: String?,
@@ -166,7 +168,7 @@ class UserController @Autowired constructor(
         val phoneVisibility: Boolean?
     )
 
-    data class UpdatePasswordRequest (
+    data class UpdatePasswordRequest(
         val oldPassword: String,
         val newPassword: String
     )

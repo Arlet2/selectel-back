@@ -4,9 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository
 import su.arlet.selectelback.core.User
 
 interface UserRepo : JpaRepository<User, Long> {
-    fun existsUserByLoginOrEmail(login : String, email : String) : Boolean
-    fun existsUserByLogin(login : String) : Boolean
-    fun existsUserByEmail(email : String) : Boolean
-    fun getUserByLogin(login : String): User
-    fun getUserByEmail(email : String): User
+    fun existsUserByLoginOrEmail(login: String, email: String): Boolean
+    fun existsUserByLogin(login: String): Boolean
+    fun existsUserByEmail(email: String): Boolean
+    fun getUserByLogin(login: String): User
+    fun getUserByEmail(email: String): User
 }

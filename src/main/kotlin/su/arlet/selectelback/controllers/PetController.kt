@@ -1,18 +1,22 @@
 package su.arlet.selectelback.controllers
 
-import io.swagger.v3.oas.annotations.*
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.*
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import su.arlet.selectelback.controllers.filters.RangeFilter
 import su.arlet.selectelback.controllers.responses.EntityCreatedResponse
 import su.arlet.selectelback.controllers.responses.PetResponse
-import su.arlet.selectelback.core.*
+import su.arlet.selectelback.core.BloodType
+import su.arlet.selectelback.core.Pet
+import su.arlet.selectelback.core.PetType
+import su.arlet.selectelback.core.Vaccination
 import su.arlet.selectelback.exceptions.BadEntityException
 import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.*
@@ -77,7 +81,7 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - pet not found", content = [Content()])
     fun getPetById(@PathVariable id: Long): ResponseEntity<PetResponse> {
-        val pet = petRepo.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
+        val pet = petRepo.findById(id).orElseThrow { throw EntityNotFoundException("pet") }
         return ResponseEntity.ok(PetResponse(pet))
     }
 
@@ -131,21 +135,26 @@ class PetController @Autowired constructor(
 
     @PostMapping("/")
     @Operation(summary = "Create a new pet")
-    @ApiResponse(responseCode = "201", description = "Added", content = [
-        Content(
-            mediaType = "application/json",
-            schema = Schema(implementation = EntityCreatedResponse::class)
-        )
-    ])
+    @ApiResponse(
+        responseCode = "201", description = "Added", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = EntityCreatedResponse::class)
+            )
+        ]
+    )
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found (incorrect ids)", content = [Content()])
-    fun createPet(@RequestBody petRequest: CreatePetRequest, request: HttpServletRequest): ResponseEntity<EntityCreatedResponse> {
+    fun createPet(
+        @RequestBody petRequest: CreatePetRequest,
+        request: HttpServletRequest
+    ): ResponseEntity<EntityCreatedResponse> {
         try {
             val createdEntity = petRepo.save(
                 Pet(
                     owner = petRequest.ownerId.let {
-                        userRepo.findById(it).orElseThrow{ throw EntityNotFoundException("user") }
+                        userRepo.findById(it).orElseThrow { throw EntityNotFoundException("user") }
                     },
                     petType = petRequest.petTypeId.let {
                         petTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("pet type") }
@@ -168,12 +177,14 @@ class PetController @Autowired constructor(
 
     @PostMapping("/{id}/vaccination")
     @Operation(summary = "Create a new pet vaccination")
-    @ApiResponse(responseCode = "201", description = "Added", content = [
-        Content(
-            mediaType = "application/json",
-            schema = Schema(implementation = EntityCreatedResponse::class)
-        )
-    ])
+    @ApiResponse(
+        responseCode = "201", description = "Added", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = EntityCreatedResponse::class)
+            )
+        ]
+    )
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found", content = [Content()])
@@ -183,7 +194,7 @@ class PetController @Autowired constructor(
         try {
             val createdEntity = vaccinationsRepo.save(
                 Vaccination(
-                    pet = petRepo.findById(id).orElseThrow{ throw EntityNotFoundException("pet") },
+                    pet = petRepo.findById(id).orElseThrow { throw EntityNotFoundException("pet") },
                     name = vaccinationRequest.name,
                     description = vaccinationRequest.description,
                     vaccinationDate = vaccinationRequest.vaccinationDate
@@ -203,7 +214,7 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - pet not found", content = [Content()])
     fun updatePet(@PathVariable id: Long, @RequestBody updatedPet: UpdatePetRequest): ResponseEntity<PetResponse> {
-        val pet = petRepo.findById(id).orElseThrow{ throw EntityNotFoundException("pet") }
+        val pet = petRepo.findById(id).orElseThrow { throw EntityNotFoundException("pet") }
         updatePetFields(pet, updatedPet)
         petRepo.save(pet)
         return ResponseEntity.ok(PetResponse(pet))
@@ -219,7 +230,7 @@ class PetController @Autowired constructor(
         @PathVariable id: Long, @PathVariable vaccinationId: Long,
         @RequestBody updatedVaccination: UpdateVaccinationRequest
     ): ResponseEntity<*> {
-        val vaccination = vaccinationsRepo.findById(vaccinationId).orElseThrow{
+        val vaccination = vaccinationsRepo.findById(vaccinationId).orElseThrow {
             throw EntityNotFoundException("vaccination")
         }
 
@@ -300,6 +311,7 @@ class PetController @Autowired constructor(
         var vaccinationDate: LocalDate,
         var description: String?
     )
+
     data class UpdateVaccinationRequest(
         var name: String? = null,
         var vaccinationDate: LocalDate? = null,

@@ -1,11 +1,8 @@
 package su.arlet.selectelback.controllers.responses
 
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
 import su.arlet.selectelback.core.BloodType
 import su.arlet.selectelback.core.Pet
 import su.arlet.selectelback.core.PetType
-import su.arlet.selectelback.core.User
 import java.time.LocalDate
 
 class PetResponse(

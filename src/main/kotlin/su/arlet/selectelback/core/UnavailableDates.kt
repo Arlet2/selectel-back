@@ -6,7 +6,7 @@ import jakarta.persistence.Table
 import java.time.LocalDate
 
 @Entity
-@Table(name="unavailable_dates")
+@Table(name = "unavailable_dates")
 class UnavailableDates(
     @Id
     val userID: Long,

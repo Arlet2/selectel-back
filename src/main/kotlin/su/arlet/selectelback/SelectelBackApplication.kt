@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class SelectelBackApplication
 
 fun main(args: Array<String>) {
-	runApplication<SelectelBackApplication>(*args)
+    runApplication<SelectelBackApplication>(*args)
 }
