@@ -3,11 +3,14 @@ package su.arlet.selectelback.configs
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.security.SecurityScheme
-
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.servers.Server
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import java.util.List
 
 
 @SecurityScheme(
@@ -24,5 +27,12 @@ class WebConfig : WebMvcConfigurer {
             .allowedOrigins("http://localhost:3000", "https://petdonor.ru", "http://127.0.0.1:3000")
             .allowedMethods("POST", "GET", "PUT", "DELETE", "PATCH")
             .allowCredentials(true).maxAge(3600)
+    }
+
+    @Bean
+    fun customOpenAPI(): OpenAPI {
+        val server = Server()
+        server.url = "https://api.petdonor.ru/"
+        return OpenAPI().servers(listOf(server))
     }
 }

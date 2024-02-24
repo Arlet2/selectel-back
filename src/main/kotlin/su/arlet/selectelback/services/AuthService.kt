@@ -15,10 +15,12 @@ import su.arlet.selectelback.exceptions.UserExistsError
 import su.arlet.selectelback.exceptions.UserNotFoundError
 import su.arlet.selectelback.repos.TokenRepo
 import su.arlet.selectelback.repos.UserRepo
+import java.security.SecureRandom
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
+import javax.crypto.SecretKey
 
 
 @Component
@@ -27,7 +29,7 @@ class AuthService @Autowired constructor(
     private val userRepo: UserRepo,
 ) {
     private val PASSWORD_HASH_COST = 12
-    private val key = Jwts.SIG.HS256.key().build() // todo: stable key
+    private val key = Jwts.SIG.HS256.key().random(SecureRandom(byteArrayOf(2, 2, 8))).build()
 
     fun getAccessToken(request: HttpServletRequest): String {
         return request.getHeader("Authorization").replace("bearer ", "", true) // todo: fix it
