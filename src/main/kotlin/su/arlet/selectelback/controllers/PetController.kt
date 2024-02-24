@@ -65,7 +65,8 @@ class PetController @Autowired constructor(
                 if (startDate != null && endDate == null && !startDate.isAfter(LocalDate.now()))
                     return@filter false
                 if (startDate != null && endDate != null &&
-                    !startDate.isAfter(LocalDate.now()) && !endDate.isBefore(LocalDate.now())) // in range inclusive
+                    !startDate.isAfter(LocalDate.now()) && !endDate.isBefore(LocalDate.now())
+                ) // in range inclusive
                     return@filter false
             }
 

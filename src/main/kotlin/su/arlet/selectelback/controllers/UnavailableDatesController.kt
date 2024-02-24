@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import su.arlet.selectelback.core.UnavailableDates
 import su.arlet.selectelback.exceptions.BadEntityException
-import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.UnavailableDatesRepo
 import su.arlet.selectelback.services.AuthService
 import java.time.LocalDate
@@ -35,9 +34,11 @@ class UnavailableDatesController @Autowired constructor(
 
     @GetMapping("/")
     @Operation(summary = "Get unavailable dates")
-    @ApiResponse(responseCode = "200", description = "OK", content = [
-        Content(schema = Schema(implementation = UnavailableDates::class))],
-        )
+    @ApiResponse(
+        responseCode = "200", description = "OK",
+        content = [
+            Content(schema = Schema(implementation = UnavailableDates::class))],
+    )
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun getUnavailableDates(

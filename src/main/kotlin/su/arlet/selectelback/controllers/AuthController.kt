@@ -217,7 +217,9 @@ class AuthController @Autowired constructor(
                 postRequestService.getUserInfo(
                     userToken = response["access_token"].toString(), vkUserId = vkUserId
                 )
-            } catch (_: IllegalStateException) { null }
+            } catch (_: IllegalStateException) {
+                null
+            }
 
             val location: Location? = userInfo?.let {
                 try {
@@ -226,7 +228,9 @@ class AuthController @Autowired constructor(
                     if (locationRepo.existsLocationByCity(city))
                         locationRepo.getLocationByCityAndDistrictIsNull(city)
                     else null
-                } catch (_: JSONException) { null }
+                } catch (_: JSONException) {
+                    null
+                }
             }
 
             val userLogin = "vk_${vkUserId}"

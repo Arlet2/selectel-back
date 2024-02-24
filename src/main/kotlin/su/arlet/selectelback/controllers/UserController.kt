@@ -24,7 +24,6 @@ import su.arlet.selectelback.services.AuthService
 import su.arlet.selectelback.services.ImageService
 import su.arlet.selectelback.services.staticFilesPath
 import java.nio.file.Files
-import java.nio.file.Paths
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
 
@@ -142,11 +141,11 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    @PostMapping("/avatar", consumes=[MediaType.MULTIPART_FORM_DATA_VALUE])
+    @PostMapping("/avatar", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun uploadAvatarFile(
         request: HttpServletRequest,
         @RequestParam("file") file: MultipartFile,
-        ): Any? {
+    ): Any? {
         val userID: Long = authService.getUserID(request)
         val user = userRepository.findById(userID).get()
 
@@ -166,7 +165,8 @@ class UserController @Autowired constructor(
             if (extension == null) {
                 return ResponseEntity("no extension on file", HttpStatus.BAD_REQUEST)
             }
-            val path = Path(staticFilesPath.pathString, imageService.hashFilename(file.name)+extension).toAbsolutePath()
+            val path =
+                Path(staticFilesPath.pathString, imageService.hashFilename(file.name) + extension).toAbsolutePath()
 
             // todo: if file exists
             Files.copy(file.inputStream, path)
