@@ -70,20 +70,25 @@ class DonorRequestController @Autowired constructor(
         }
 
         val donorRequests = donorRequestRepo.findAll().toList().filter {
-            /*
             if (isMyRequests != null) {
                 if (isMyRequests && it.user.id != userID) { // not null and true meaning
                     return@filter false
-                } else if (isMyRequests != null && it.user.id == userID) {
+                } else if (!isMyRequests && it.user.id == userID) {
                     return@filter false
                 }
             }
 
-            if (dateBefore?.isBefore(it.availableUntil) != true)
-                return@filter false
+            if (dateBefore != null) {
+                if (!dateBefore.isBefore(it.availableUntil)) {
+                    return@filter false
+                }
+            }
 
-            if (dateAfter?.isAfter(it.availableUntil) != true)
-                return@filter false
+            if (dateAfter != null) {
+                if (!dateAfter.isAfter(it.availableUntil)) {
+                    return@filter false
+                }
+            }
 
             if (!rangeFilter.equal(it.user.location?.id, locationID))
                 return@filter false
@@ -93,8 +98,6 @@ class DonorRequestController @Autowired constructor(
 
             if (!rangeFilter.equal(it.bloodType.id, bloodTypeID))
                 return@filter false
-
-             */
 
             return@filter true
         }.map {
