@@ -98,16 +98,7 @@ class AuthService @Autowired constructor (
             lastActive = LocalDateTime.now(),
         ))
 
-        val accessToken = createAccessToken(entity.id)
-        val refreshToken = createRefreshToken(entity.id)
-
-        tokenRepo.save(Tokens(
-            userID = entity.id,
-            accessToken = accessToken,
-            refreshToken = refreshToken,
-        ))
-
-        return Pair(accessToken, refreshToken)
+        return createTokenById(entity.id)
     }
 
     fun hashPassword(password: String) : String {
@@ -128,15 +119,19 @@ class AuthService @Autowired constructor (
             throw UserNotFoundError()
         }
 
-        if (!passwordsEquals(password, user.passwordHash)) {
+        if (user.passwordHash == null || !passwordsEquals(password, user.passwordHash!!)) {
             throw IncorrectPasswordError()
         }
 
-        val accessToken = createAccessToken(user.id)
-        val refreshToken = createRefreshToken(user.id)
+        return createTokenById(user.id)
+    }
+
+    fun createTokenById(userId: Long) : Pair<String, String> {
+        val accessToken = createAccessToken(userId)
+        val refreshToken = createRefreshToken(userId)
 
         tokenRepo.save(Tokens(
-            userID = user.id,
+            userID = userId,
             accessToken = accessToken,
             refreshToken = refreshToken,
         ))

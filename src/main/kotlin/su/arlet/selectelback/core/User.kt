@@ -10,12 +10,12 @@ class User (
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     val id: Long = 0,
     val login : String,
-    val email : String,
+    val email : String? = null,
     var phone : String? = null,
     var surname: String? = null,
     var name : String? = null,
     var middleName: String? = null,
-    var passwordHash: String,
+    var passwordHash: String? = null,
     val created: LocalDate,
     var lastActive: LocalDateTime,
 
@@ -28,6 +28,7 @@ class User (
     var tgUserName: String? = null,
     val vkUserId: String? = null,
 
+    var isPasswordSet: Boolean? = true,
     var emailVisibility: Boolean? = true,
     var phoneVisibility: Boolean? = true
 )

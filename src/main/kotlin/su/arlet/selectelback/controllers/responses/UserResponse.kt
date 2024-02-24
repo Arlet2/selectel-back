@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 class UserResponse(
     val id: Long,
     val login : String,
-    val email : String,
+    val email : String? = null,
     var phone : String? = null,
     var surname: String? = null,
     var name : String? = null,
@@ -20,6 +20,7 @@ class UserResponse(
     var avatar: String? = null,
     var vkUserName: String? = null,
     var tgUserName: String? = null,
+    var isPasswordSet: Boolean? = null,
     var emailVisibility: Boolean? = null,
     var phoneVisibility: Boolean? = null
 ) {
@@ -36,6 +37,7 @@ class UserResponse(
         user.avatar,
         user.vkUserName,
         user.tgUserName,
+        user.isPasswordSet,
         user.emailVisibility,
         user.phoneVisibility
     )

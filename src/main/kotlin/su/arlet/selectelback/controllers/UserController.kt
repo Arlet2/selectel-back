@@ -107,7 +107,10 @@ class UserController @Autowired constructor(
         val id: Long = authService.getUserID(request)
         val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
 
-        return if (authService.passwordsEquals(updatePass.oldPassword, user.passwordHash)) {
+        return if (
+                user.passwordHash == null ||
+                authService.passwordsEquals(updatePass.oldPassword, user.passwordHash!!)
+            ) {
             user.passwordHash = authService.hashPassword(updatePass.newPassword)
             userRepository.save(user)
 

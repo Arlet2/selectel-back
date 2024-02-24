@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest
 import lombok.EqualsAndHashCode
 import lombok.Getter
 import lombok.Setter
+import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,17 +19,29 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import su.arlet.selectelback.core.User
 import su.arlet.selectelback.exceptions.IncorrectPasswordError
 import su.arlet.selectelback.exceptions.UnauthorizedError
 import su.arlet.selectelback.exceptions.UserExistsError
+import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.services.AuthService
+import su.arlet.selectelback.services.PostRequestService
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping(value = ["\${api.path}/auth"])
 @Tag(name = "Auth API")
 class AuthController @Autowired constructor(
-    private val authService: AuthService,
+        private val userRepository: UserRepo,
+        private val authService: AuthService,
+        private val postRequestService: PostRequestService
     ){
+    private val VK_URL = "https://api.vk.com/method/auth.exchangeSilentAuthToken"
 
     data class UserLoginRequest(
         val login: String,
@@ -64,6 +77,7 @@ class AuthController @Autowired constructor(
                 )
             ),
             ApiResponse(
+
                 responseCode = "500", description = "Internal error", content = arrayOf(Content()),
             )
         ]
@@ -180,4 +194,49 @@ class AuthController @Autowired constructor(
 
         return ResponseEntity(AuthResponse(accessToken, newRefreshToken), HttpStatus.OK)
     }
+
+    @PostMapping("/vk_login")
+    @Operation(summary = "Login user by VK")
+    @ApiResponse(responseCode = "200", description = "Success - user authorized")
+    @ApiResponse(responseCode = "204", description = "No content", content = [Content()])
+    @ApiResponse(responseCode = "401", description = "Wrong token given", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    fun loginVk(@RequestBody(required = true) vkAuthRequest: VkAuthRequest): ResponseEntity<*> {
+        // todo try catch
+        var response = postRequestService.sendPostRequest(VK_URL, vkAuthRequest)
+        response = JSONObject(response["response"].toString())
+
+        if (!response.has("user_id"))
+            return ResponseEntity("Invalid token", HttpStatus.UNAUTHORIZED)
+
+        val vkUserId: String = response["user_id"].toString()
+
+        val user: User = if (userRepository.existsUserByVkUserId(vkUserId)) {
+            userRepository.getUserByVkUserId(vkUserId)
+        } else {
+            val userLogin = "vk_${vkUserId}"
+            val user = User(
+                login = userLogin,
+                created = LocalDate.now(),
+                lastActive = LocalDateTime.now(),
+                isPasswordSet = false
+            )
+            userRepository.save(user)
+        }
+
+        val (accessToken, refreshToken) = authService.createTokenById(user.id)
+
+        return ResponseEntity(VkAuthResponse(user.login, accessToken, refreshToken), HttpStatus.OK)
+    }
+
+    data class VkAuthRequest(
+        val token: String,
+        val uuid: String
+    )
+
+    data class VkAuthResponse(
+        val login: String,
+        val accessToken: String,
+        val refreshToken: String,
+    )
 }
