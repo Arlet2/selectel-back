@@ -64,8 +64,8 @@ class UserController @Autowired constructor(
         }
         updatedUser.vkUserName?.let { user.vkUserName = it }
         updatedUser.tgUserName?.let { user.tgUserName = it }
-        updatedUser.emailViability?.let { user.emailVisibility = it }
-        updatedUser.phoneViability?.let { user.phoneVisibility = it }
+        updatedUser.emailVisibility?.let { user.emailVisibility = it }
+        updatedUser.phoneVisibility?.let { user.phoneVisibility = it }
     }
 
     data class UpdateUserRequest (
@@ -77,7 +77,7 @@ class UserController @Autowired constructor(
         val locationId: Long?,
         val vkUserName: String?,
         val tgUserName: String?,
-        val emailViability: Boolean?,
-        val phoneViability: Boolean?
+        val emailVisibility: Boolean?,
+        val phoneVisibility: Boolean?
     )
 }
