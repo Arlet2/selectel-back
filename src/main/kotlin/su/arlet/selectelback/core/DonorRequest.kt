@@ -1,5 +1,6 @@
 package su.arlet.selectelback.core
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -20,5 +21,6 @@ class DonorRequest(
     @JoinColumn(name = "blood_type_id")
     var bloodType: BloodType,
     var bloodAmountMl: Double,
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     var availableUntil: LocalDate?,
 )

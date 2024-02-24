@@ -1,5 +1,6 @@
 package su.arlet.selectelback.core
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
@@ -10,6 +11,8 @@ import java.time.LocalDate
 class UnavailableDates(
     @Id
     val userID: Long,
-    val startDate: LocalDate,
-    val endDate: LocalDate,
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    var startDate: LocalDate?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    var endDate: LocalDate?,
 )
