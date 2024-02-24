@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest
 import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -20,9 +21,12 @@ import su.arlet.selectelback.repos.LocationRepo
 import su.arlet.selectelback.repos.PetRepo
 import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.services.AuthService
+import su.arlet.selectelback.services.ImageService
+import su.arlet.selectelback.services.staticFilesPath
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.Path
+import kotlin.io.path.pathString
 
 
 @RestController
@@ -32,10 +36,9 @@ class UserController @Autowired constructor(
     private val userRepository: UserRepo,
     private val petRepository: PetRepo,
     private val locationRepository: LocationRepo,
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val imageService: ImageService,
 ) {
-
-    private val p: Path = Paths.get("/images")
 
     @GetMapping("/")
     @Operation(summary = "Get current user info")
@@ -134,26 +137,38 @@ class UserController @Autowired constructor(
         updatedUser.phoneVisibility?.let { user.phoneVisibility = it }
     }
 
-    @PostMapping("/avatar", consumes = ["multipart/byteranges"])
     @Operation(summary = "Upload avatar")
     @ApiResponse(responseCode = "200", description = "Success - avatar uploaded")
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    fun uploadAvatarFile(@RequestParam("file") file: MultipartFile): Any? {
+    @PostMapping("/avatar", consumes=[MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun uploadAvatarFile(
+        request: HttpServletRequest,
+        @RequestParam("file") file: MultipartFile,
+        ): Any? {
+        val userID: Long = authService.getUserID(request)
+
+        val user = userRepository.findById(userID).get()
+
         val resJsonData = JSONObject()
         try {
             if (file.isEmpty) {
                 println("Empty")
             }
 
-            Files.copy(file.inputStream, p.resolve(file.originalFilename))
+            val path = Path(staticFilesPath.pathString, imageService.hashFilename(file.name)).toAbsolutePath()
+
+            Files.copy(file.inputStream, path)
 
             resJsonData.put("status", 200)
             resJsonData.put("message", "Success!")
-            resJsonData.put("data", file.originalFilename)
+            resJsonData.put("link", path.toAbsolutePath())
+
+            user.avatar = path.pathString
+            userRepository.save(user)
         } catch (e: Exception) {
-            println(e.message)
+            println(e)
             resJsonData.put("status", 400)
             resJsonData.put("message", "Upload Image Error!")
             resJsonData.put("data", "")

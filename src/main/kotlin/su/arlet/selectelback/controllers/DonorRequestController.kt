@@ -1,5 +1,6 @@
 package su.arlet.selectelback.controllers
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -46,6 +47,7 @@ class DonorRequestController @Autowired constructor(
         var petType: PetType,
         var bloodType: BloodType,
         var bloodAmountMl: Double,
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
         var availableUntil: LocalDate?,
         var userLogin: String,
     )

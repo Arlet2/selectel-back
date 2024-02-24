@@ -1,5 +1,6 @@
 package su.arlet.selectelback.controllers.responses
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import su.arlet.selectelback.core.BloodType
 import su.arlet.selectelback.core.Pet
 import su.arlet.selectelback.core.PetType
@@ -12,6 +13,7 @@ class PetResponse(
     var bloodType: BloodType,
     var name: String,
     var description: String?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     var birthday: LocalDate?,
     var weight: Double?
 ) {
