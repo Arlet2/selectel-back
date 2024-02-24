@@ -4,6 +4,9 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Component
 import java.util.*
 
+val defaultUserAvatarURL = "https://petdonor.ru/avatar/default-avatar-user.jpg"
+val defaultPetAvatarURL = "https://petdonor.ru/avatar/default-avatar-user.jpg"
+
 @Component
 class ImageService {
     val HASH_COST = 10

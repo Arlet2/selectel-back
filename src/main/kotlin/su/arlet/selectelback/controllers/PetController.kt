@@ -6,10 +6,13 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
+import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import su.arlet.selectelback.controllers.filters.RangeFilter
 import su.arlet.selectelback.controllers.responses.EntityCreatedResponse
 import su.arlet.selectelback.controllers.responses.PetResponse
@@ -21,7 +24,14 @@ import su.arlet.selectelback.exceptions.BadEntityException
 import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.*
 import su.arlet.selectelback.services.AuthService
+import su.arlet.selectelback.services.ImageService
+import su.arlet.selectelback.services.defaultPetAvatarURL
+import su.arlet.selectelback.services.staticFilesPath
+import java.nio.file.Files
 import java.time.LocalDate
+import kotlin.io.path.Path
+import kotlin.io.path.pathString
+import kotlin.jvm.optionals.getOrNull
 
 
 @RestController
@@ -35,7 +45,8 @@ class PetController @Autowired constructor(
     private val vaccinationsRepo: VaccinationsRepo,
     private val unavailableDatesRepo: UnavailableDatesRepo,
     private val authService: AuthService,
-    private val rangeFilter: RangeFilter
+    private val rangeFilter: RangeFilter,
+    private val imageService: ImageService,
 ) {
 
     @GetMapping("/")
@@ -184,7 +195,8 @@ class PetController @Autowired constructor(
                     name = petRequest.name,
                     description = petRequest.description,
                     birthday = petRequest.birthday,
-                    weight = petRequest.weight
+                    weight = petRequest.weight,
+                    avatar = defaultPetAvatarURL,
                 )
             )
 
@@ -192,6 +204,56 @@ class PetController @Autowired constructor(
         } catch (e: IllegalArgumentException) {
             throw BadEntityException("Entity was empty: $e")
         }
+    }
+
+    @Operation(summary = "Upload avatar")
+    @ApiResponse(responseCode = "200", description = "Success - avatar uploaded")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
+    @PostMapping("/avatar", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun uploadAvatarFile(
+        request: HttpServletRequest,
+        @RequestParam("file") file: MultipartFile,
+    ): Any? {
+        val pet = petRepo.findById(0).getOrNull() ?: throw EntityNotFoundException("pet")
+
+        val resJsonData = JSONObject()
+        try {
+            if (file.isEmpty) {
+                println("Empty")
+            }
+
+            val lastDotIndex = file.originalFilename?.lastIndexOf('.') ?: 0
+            val extension = if (lastDotIndex > 0) {
+                file.originalFilename?.substring(lastDotIndex)
+            } else {
+                null
+            }
+
+            if (extension == null) {
+                return ResponseEntity("no extension on file", HttpStatus.BAD_REQUEST)
+            }
+
+            val filename = imageService.hashFilename(file.name) + extension
+            val path = Path("pet"+staticFilesPath.pathString, filename).toAbsolutePath()
+
+            // todo: if file exists
+            Files.copy(file.inputStream, path)
+
+            resJsonData.put("status", 200)
+            resJsonData.put("message", "Success!")
+            resJsonData.put("link", path.toAbsolutePath())
+
+            pet.avatar = "https://petdonor.ru/avatar/$filename"
+            petRepo.save(pet)
+        } catch (e: Exception) {
+            println(e)
+            resJsonData.put("status", 400)
+            resJsonData.put("message", "Upload Image Error!")
+            resJsonData.put("data", "")
+        }
+        return resJsonData.toString()
     }
 
     @PostMapping("/{id}/vaccination")

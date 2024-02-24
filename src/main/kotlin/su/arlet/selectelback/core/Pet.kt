@@ -30,5 +30,6 @@ data class Pet(
     var description: String?,
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     var birthday: LocalDate?,
-    var weight: Double?
+    var weight: Double?,
+    var avatar: String,
 )

@@ -33,7 +33,6 @@ class AuthService @Autowired constructor(
     private val PASSWORD_HASH_COST = 12
     private val key =
         Keys.hmacShaKeyFor(Decoders.BASE64.decode("qwerty1234567aAbada241312dfabasdjfajoifdasighiaiu249812y31hrkqh1k4jh12ued8c7hjkfjkagh782h4faiufhq87hq8aghq172h8hfaw87fgha8gha78rqufhq972h41uihdq87w6gf1wr1h872rh8f7h172rh872rh1f2"));
-    private val defaultAvatarURL = "https://petdonor.ru/avatar/default-avatar-user.jpg"
 
     fun getAccessToken(request: HttpServletRequest): String {
         return request.getHeader("Authorization")?.replace("bearer ", "", true) ?: ""
@@ -104,7 +103,7 @@ class AuthService @Autowired constructor(
                 login = login,
                 passwordHash = hashPassword(password),
                 lastActive = LocalDateTime.now(),
-                avatar = defaultAvatarURL,
+                avatar = defaultUserAvatarURL,
             )
         )
 
