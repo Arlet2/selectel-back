@@ -1,5 +1,6 @@
 package su.arlet.selectelback.services
 
+import at.favre.lib.crypto.bcrypt.BCrypt
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
@@ -25,6 +26,7 @@ class AuthService @Autowired constructor (
     private val tokenRepo: TokenRepo,
     private val userRepo : UserRepo,
 ) {
+    private val PASSWORD_HASH_COST = 12
     private val key = Jwts.SIG.HS256.key().build() // todo: stable key
 
     fun getAccessToken(request: HttpServletRequest) : String {
@@ -109,7 +111,11 @@ class AuthService @Autowired constructor (
     }
 
     fun hashPassword(password: String) : String {
-        return password
+        return BCrypt.withDefaults().hashToString(PASSWORD_HASH_COST, password.toCharArray())
+    }
+
+    fun passwordsEquals(password: String, passwordHash: String) : Boolean {
+        return BCrypt.verifyer().verify(password.toCharArray(), passwordHash).verified
     }
 
     fun login(loginOrEmail : String, password : String) : Pair<String, String> {
@@ -122,7 +128,7 @@ class AuthService @Autowired constructor (
             throw UserNotFoundError()
         }
 
-        if (hashPassword(password) != user.passwordHash) {
+        if (!passwordsEquals(password, user.passwordHash)) {
             throw IncorrectPasswordError()
         }
 

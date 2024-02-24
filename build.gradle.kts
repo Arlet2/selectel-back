@@ -31,6 +31,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt:0.12.5")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("at.favre.lib:bcrypt:0.10.2")
 
 	compileOnly ("org.projectlombok:lombok:1.18.20")
 	annotationProcessor ("org.projectlombok:lombok:1.18.20")

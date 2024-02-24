@@ -2,8 +2,9 @@ package su.arlet.selectelback.controllers
 
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.parameters.RequestBody
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,10 +35,23 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    fun getUserById(request: HttpServletRequest): ResponseEntity<User> {
+    fun getCurrentUsers(request: HttpServletRequest): ResponseEntity<User> {
         val id: Long = authService.getUserID(request)
         val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
         return ResponseEntity.ok(user)
+    }
+
+    @GetMapping("/{login}")
+    @Operation(summary = "Get user info")
+    @ApiResponse(responseCode = "200", description = "Success - found user")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
+    fun getUserByLogin(@PathVariable login: String): ResponseEntity<User> {
+        return if (userRepository.existsUserByLogin(login)) {
+            val user = userRepository.getUserByLogin(login)
+            ResponseEntity.ok(user)
+        } else ResponseEntity.notFound().build()
     }
 
     @PatchMapping("/")
@@ -53,12 +67,32 @@ class UserController @Autowired constructor(
         return ResponseEntity.ok(userRepository.save(user))
     }
 
+    @PostMapping("/changePass")
+    @Operation(summary = "Change password")
+    @ApiResponse(responseCode = "200", description = "Success - password changed")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    @ApiResponse(responseCode = "409", description = "Conflict", content = [Content()])
+    fun changePassword(
+        @RequestBody(required = true) updatePass: UpdatePasswordRequest,
+        request: HttpServletRequest
+    ): ResponseEntity<*> {
+        val id: Long = authService.getUserID(request)
+        val user = userRepository.findById(id).orElseThrow{ throw EntityNotFoundException("user") }
+
+        return if (authService.passwordsEquals(updatePass.oldPassword, user.passwordHash)) {
+            user.passwordHash = authService.hashPassword(updatePass.newPassword)
+            userRepository.save(user)
+
+            ResponseEntity.ok("Success")
+        } else ResponseEntity(null, HttpStatus.CONFLICT)
+    }
+
     private fun updateUserFields(user: User, updatedUser: UpdateUserRequest) {
         updatedUser.phone?.let { user.phone = it }
         updatedUser.surname?.let { user.surname = it }
         updatedUser.name?.let { user.name = it }
         updatedUser.lastName?.let { user.middleName = it }
-        updatedUser.password?.let { user.passwordHash = authService.hashPassword(it) }
         updatedUser.locationId?.let {
             user.location = locationRepository.findById(it).orElseThrow { throw EntityNotFoundException("location") }
         }
@@ -73,11 +107,15 @@ class UserController @Autowired constructor(
         val surname: String?,
         val name : String?,
         val lastName: String?,
-        val password: String?,
         val locationId: Long?,
         val vkUserName: String?,
         val tgUserName: String?,
         val emailVisibility: Boolean?,
         val phoneVisibility: Boolean?
+    )
+
+    data class UpdatePasswordRequest (
+        val oldPassword: String,
+        val newPassword: String
     )
 }
