@@ -99,8 +99,8 @@ class PetController @Autowired constructor(
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
-    fun getCities(): List<String> {
-        return petTypeRepo.findTypes()
+    fun getCities(): List<PetType> {
+        return petTypeRepo.findByBreedIsNull()
     }
 
     @GetMapping("/breeds")

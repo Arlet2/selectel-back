@@ -26,8 +26,8 @@ class LocationController @Autowired constructor(
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
-    fun getCities(): List<String> {
-        return locationRepo.findCities()
+    fun getCities(): List<Location> {
+        return locationRepo.findByDistrictIsNull()
     }
 
     @GetMapping("/districts")

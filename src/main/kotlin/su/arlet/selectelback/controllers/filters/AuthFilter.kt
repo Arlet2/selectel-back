@@ -40,8 +40,11 @@ class AuthFilter(private val authService: AuthService) : Filter {
         // Define the URLs that should be excluded from filtering
         // Return true if the URL should be excluded, false otherwise
         return requestUri.startsWith("/back/api/v1/auth/")
+                || requestUri.startsWith("/back/api/v1/location")
+                || requestUri.startsWith("/back/api/v1/pets/types")
+                || requestUri.startsWith("/back/api/v1/pets/breeds")
+                || requestUri.startsWith("/back/api/v1/pets/blood_types")
                 || requestUri.startsWith("/swagger")
                 || requestUri.startsWith("/docs")
     }
-
 }

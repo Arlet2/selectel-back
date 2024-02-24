@@ -6,7 +6,6 @@ import su.arlet.selectelback.core.Location
 import su.arlet.selectelback.core.PetType
 
 interface PetTypeRepo : JpaRepository<PetType, Long> {
-    @Query("SELECT DISTINCT p.type FROM PetType p")
-    fun findTypes(): List<String>
+    fun findByBreedIsNull(): List<PetType>
     fun findByType(type: String): List<PetType>?
 }
