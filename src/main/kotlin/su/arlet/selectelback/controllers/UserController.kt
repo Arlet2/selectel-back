@@ -167,7 +167,7 @@ class UserController @Autowired constructor(
             }
 
             val filename = imageService.hashFilename(file.name) + extension
-            val path = Path("user"+staticFilesPath.pathString, filename).toAbsolutePath()
+            val path = Path("user" + staticFilesPath.pathString, filename).toAbsolutePath()
 
             // todo: if file exists
             Files.copy(file.inputStream, path)

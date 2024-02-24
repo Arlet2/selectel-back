@@ -236,7 +236,7 @@ class PetController @Autowired constructor(
             }
 
             val filename = imageService.hashFilename(file.name) + extension
-            val path = Path("pet"+staticFilesPath.pathString, filename).toAbsolutePath()
+            val path = Path("pet" + staticFilesPath.pathString, filename).toAbsolutePath()
 
             // todo: if file exists
             Files.copy(file.inputStream, path)
@@ -354,8 +354,12 @@ class PetController @Autowired constructor(
     }
 
     private fun updatePetFields(pet: Pet, updatedPet: UpdatePetRequest) {
-        updatedPet.petTypeId?.let { pet.petType = petTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("petType") } }
-        updatedPet.bloodTypeId?.let { pet.bloodType = bloodTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("bloodType") } }
+        updatedPet.petTypeId?.let {
+            pet.petType = petTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("petType") }
+        }
+        updatedPet.bloodTypeId?.let {
+            pet.bloodType = bloodTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("bloodType") }
+        }
         updatedPet.name?.let { pet.name = it }
         updatedPet.description?.let { pet.description = it }
         updatedPet.birthday?.let { pet.birthday = it }
