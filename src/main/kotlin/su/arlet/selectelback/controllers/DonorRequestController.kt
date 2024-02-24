@@ -47,6 +47,7 @@ class DonorRequestController @Autowired constructor(
         var bloodType: BloodType,
         var bloodAmountMl: Double,
         var availableUntil: LocalDate?,
+        var userLogin: String,
     )
 
     @GetMapping("/")
@@ -120,6 +121,7 @@ class DonorRequestController @Autowired constructor(
                 bloodType = it.bloodType,
                 bloodAmountMl = it.bloodAmountMl,
                 availableUntil = it.availableUntil,
+                userLogin = it.user.login,
             )
         }
 
