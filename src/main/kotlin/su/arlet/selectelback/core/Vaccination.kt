@@ -15,7 +15,6 @@ data class Vaccination(
     val id: Long = 0,
 
     @ManyToOne(cascade = [CascadeType.REMOVE])
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "petId")
     var pet: Pet,
 

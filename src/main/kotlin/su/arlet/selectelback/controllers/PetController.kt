@@ -172,8 +172,8 @@ class PetController @Autowired constructor(
             )
 
             return ResponseEntity(EntityCreatedResponse(createdEntity.id), HttpStatus.CREATED)
-        } catch (_: IllegalArgumentException) {
-            throw BadEntityException("Entity was empty")
+        } catch (e: IllegalArgumentException) {
+            throw BadEntityException("Entity was empty: $e")
         }
     }
 
@@ -290,7 +290,6 @@ class PetController @Autowired constructor(
     }
 
     data class CreatePetRequest(
-        var ownerId: Long,
         var petTypeId: Long,
         var bloodTypeId: Long,
         var name: String,

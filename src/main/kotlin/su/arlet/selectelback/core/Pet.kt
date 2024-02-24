@@ -13,8 +13,7 @@ data class Pet(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @ManyToOne(cascade = [CascadeType.REMOVE])
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "ownerId")
     var owner: User,
 
