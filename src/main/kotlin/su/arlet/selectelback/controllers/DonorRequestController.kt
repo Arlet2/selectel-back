@@ -147,7 +147,6 @@ class DonorRequestController @Autowired constructor (
     }
 
     data class CreateDonorRequest(
-        var userID: Long,
         var description: String?,
         var vetAddress: String?,
         var petTypeID: Long,
