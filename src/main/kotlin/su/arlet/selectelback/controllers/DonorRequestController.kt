@@ -73,10 +73,6 @@ class DonorRequestController @Autowired constructor(
         )
             return ResponseEntity("Нельзя создать заявку без контактных данных", HttpStatus.CONFLICT)
 
-        if (dateBefore != null && dateAfter == null || dateBefore == null && dateAfter != null) {
-            return ResponseEntity("only range is possible", HttpStatus.BAD_REQUEST)
-        }
-
         val donorRequests = donorRequestRepo.findAll().toList().filter {
             if (isMyRequests != null) {
                 if (isMyRequests && it.user.id != userID) { // not null and true meaning
@@ -87,13 +83,13 @@ class DonorRequestController @Autowired constructor(
             }
 
             if (dateBefore != null) {
-                if (!dateBefore.isBefore(it.availableUntil)) {
+                if (!dateBefore.isAfter(it.availableUntil)) {
                     return@filter false
                 }
             }
 
             if (dateAfter != null) {
-                if (!dateAfter.isAfter(it.availableUntil)) {
+                if (!dateAfter.isBefore(it.availableUntil)) {
                     return@filter false
                 }
             }
