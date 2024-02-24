@@ -31,7 +31,7 @@ class AuthService @Autowired constructor(
     private val userRepo: UserRepo,
 ) {
     private val PASSWORD_HASH_COST = 12
-    private val key = Keys.hmacShaKeyFor(Decoders.BASE64.decode("qwerty1234567@aA"));
+    private val key = Keys.hmacShaKeyFor(Decoders.BASE64.decode("qwerty1234567aA"));
 
     fun getAccessToken(request: HttpServletRequest): String {
         return request.getHeader("Authorization").replace("bearer ", "", true) // todo: fix it
