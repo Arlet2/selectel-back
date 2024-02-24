@@ -15,7 +15,8 @@ class PetResponse(
     var description: String?,
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     var birthday: LocalDate?,
-    var weight: Double?
+    var weight: Double?,
+    var avatar: String?,
 ) {
     constructor(pet: Pet) : this(
         pet.id,
@@ -25,6 +26,7 @@ class PetResponse(
         pet.name,
         pet.description,
         pet.birthday,
-        pet.weight
+        pet.weight,
+        pet.avatar,
     )
 }
