@@ -33,6 +33,7 @@ class PetController @Autowired constructor(
     private val petTypeRepo: PetTypeRepo,
     private val bloodTypeRepo: BloodTypeRepo,
     private val vaccinationsRepo: VaccinationsRepo,
+    private val unavailableDatesRepo: UnavailableDatesRepo,
     private val authService: AuthService,
     private val rangeFilter: RangeFilter
 ) {
@@ -53,6 +54,21 @@ class PetController @Autowired constructor(
         @RequestParam(name = "bloodType", required = false) bloodType: String?,
     ): List<PetResponse> {
         return petRepo.findAll().toList().filter {
+            val unavailableDates = unavailableDatesRepo.findById(it.owner.id)
+
+            if (unavailableDates.isPresent) {
+                val startDate = unavailableDates.get().startDate
+                val endDate = unavailableDates.get().endDate
+
+                if (startDate == null && endDate != null && !endDate.isBefore(LocalDate.now()))
+                    return@filter false
+                if (startDate != null && endDate == null && !startDate.isAfter(LocalDate.now()))
+                    return@filter false
+                if (startDate != null && endDate != null &&
+                    !startDate.isAfter(LocalDate.now()) && !endDate.isBefore(LocalDate.now())) // in range inclusive
+                    return@filter false
+            }
+
             if (!rangeFilter.equal(it.owner.location?.id, locationId))
                 return@filter false
             if (!rangeFilter.equal(it.owner.location?.city, city))

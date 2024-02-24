@@ -47,7 +47,9 @@ class UnavailableDatesController @Autowired constructor(
 
         val unavailableDates = unavailableDatesRepo.findById(userID)
         if (unavailableDates.isPresent) {
-            if (unavailableDates.get().endDate!!.isBefore(LocalDate.now())) {
+            val endDate = unavailableDates.get().endDate
+
+            if (endDate != null && endDate.isBefore(LocalDate.now())) {
                 return ResponseEntity(
                     UnavailableDates(
                         userID = userID,
@@ -56,7 +58,8 @@ class UnavailableDatesController @Autowired constructor(
                     ), HttpStatus.OK
                 )
             }
-            return ResponseEntity(unavailableDates, HttpStatus.OK)
+
+            return ResponseEntity(unavailableDates.get(), HttpStatus.OK)
         }
 
         return ResponseEntity(
@@ -84,10 +87,10 @@ class UnavailableDatesController @Autowired constructor(
     fun createUnavailableDates(
         request: HttpServletRequest,
         @RequestBody unavailableDatesRequest: UnavailableDatesRequest
-    ): ResponseEntity<*> {
+    ): ResponseEntity<UnavailableDates> {
         val userID = authService.getUserID(request)
         try {
-            unavailableDatesRepo.save(
+            val unavailableDates = unavailableDatesRepo.save(
                 UnavailableDates(
                     userID = userID,
                     startDate = unavailableDatesRequest.startDate,
@@ -95,7 +98,7 @@ class UnavailableDatesController @Autowired constructor(
                 )
             )
 
-            return ResponseEntity(null, HttpStatus.CREATED)
+            return ResponseEntity(unavailableDates, HttpStatus.CREATED)
         } catch (_: IllegalArgumentException) {
             throw BadEntityException("Entity was empty")
         }
