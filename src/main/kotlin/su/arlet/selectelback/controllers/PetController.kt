@@ -233,8 +233,8 @@ class PetController @Autowired constructor(
                 return ResponseEntity("no extension on file", HttpStatus.BAD_REQUEST)
             }
 
-            val filename = imageService.hashFilename(file.name) + extension
-            val path = Path("pet" + staticFilesPath.pathString, filename).toAbsolutePath()
+            val filename = "pet"+imageService.hashFilename(file.name) + extension
+            val path = Path( staticFilesPath.pathString, filename).toAbsolutePath()
 
             // todo: if file exists
             Files.copy(file.inputStream, path)

@@ -166,8 +166,8 @@ class UserController @Autowired constructor(
                 return ResponseEntity("no extension on file", HttpStatus.BAD_REQUEST)
             }
 
-            val filename = imageService.hashFilename(file.name) + extension
-            val path = Path("user" + staticFilesPath.pathString, filename).toAbsolutePath()
+            val filename = "user"+imageService.hashFilename(file.name) + extension
+            val path = Path(staticFilesPath.pathString, filename).toAbsolutePath()
 
             // todo: if file exists
             Files.copy(file.inputStream, path)
