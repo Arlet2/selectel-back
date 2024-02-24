@@ -177,7 +177,7 @@ class UserController @Autowired constructor(
             resJsonData.put("message", "Success!")
             resJsonData.put("link", path.toAbsolutePath())
 
-            user.avatar = "https://petdonor.ru/avatar/"+filename
+            user.avatar = "https://petdonor.ru/avatar/" + filename
             userRepository.save(user)
         } catch (e: Exception) {
             println(e)
