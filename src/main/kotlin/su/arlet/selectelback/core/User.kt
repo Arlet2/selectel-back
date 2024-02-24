@@ -10,7 +10,7 @@ class User(
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     val id: Long = 0,
     val login: String,
-    val email: String? = null,
+    var email: String? = null,
     var phone: String? = null,
     var surname: String? = null,
     var name: String? = null,

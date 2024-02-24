@@ -119,6 +119,7 @@ class UserController @Autowired constructor(
     }
 
     private fun updateUserFields(user: User, updatedUser: UpdateUserRequest) {
+        updatedUser.email?.let { user.email = it }
         updatedUser.phone?.let { user.phone = it }
         updatedUser.surname?.let { user.surname = it }
         updatedUser.name?.let { user.name = it }
@@ -160,6 +161,7 @@ class UserController @Autowired constructor(
     }
 
     data class UpdateUserRequest(
+        val email: String?,
         val phone: String?,
         val surname: String?,
         val name: String?,
