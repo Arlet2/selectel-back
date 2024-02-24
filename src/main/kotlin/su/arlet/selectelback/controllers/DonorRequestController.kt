@@ -70,11 +70,14 @@ class DonorRequestController @Autowired constructor(
         }
 
         val donorRequests = donorRequestRepo.findAll().toList().filter {
-            if (isMyRequests == true && it.user.id != userID) { // not null and true meaning
-                return@filter false
-            } else if (isMyRequests != null && it.user.id == userID) {
-                return@filter false
-            }
+            /*
+            if (isMyRequests != null) {
+                if (isMyRequests && it.user.id != userID) { // not null and true meaning
+                    return@filter false
+                } else if (isMyRequests != null && it.user.id == userID) {
+                    return@filter false
+                }
+            }*/
 
             if (dateBefore?.isBefore(it.availableUntil) != true)
                 return@filter false
