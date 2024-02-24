@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode
 import lombok.Getter
 import lombok.Setter
 import org.json.JSONObject
+import org.json.JSONPropertyName
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -200,7 +201,7 @@ class AuthController @Autowired constructor(
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun loginVk(@RequestBody(required = true) vkAuthRequest: VkAuthRequest): ResponseEntity<*> {
         // todo try catch
-        var response = postRequestService.sendPostRequest(VK_URL, getVkAuthInfo(vkAuthRequest))
+        var response = postRequestService.sendPostRequest(VK_URL, VkAuthInfo(vkAuthRequest))
         response = JSONObject(response["response"].toString())
 
         if (!response.has("user_id"))
@@ -226,14 +227,14 @@ class AuthController @Autowired constructor(
         return ResponseEntity(VkAuthResponse(user.login, accessToken, refreshToken), HttpStatus.OK)
     }
 
-    fun getVkAuthInfo(vkAuthRequest: VkAuthRequest) : Map<String, String> {
-        val accessToken = "983ca070983ca070983ca070519b2bff159983c983ca070fde428633e93e2d7d7ded22d"
-        return mapOf(
-            "token" to vkAuthRequest.token,
-            "uuid" to vkAuthRequest.uuid,
-            "access_token" to accessToken
-        )
-    }
+    data class VkAuthInfo(
+        @get:JSONPropertyName("token")
+        val token: String,
+        @get:JSONPropertyName("uuid")
+        val uuid: String,
+        @get:JSONPropertyName("access_token")
+        val accessToken: String = "983ca070983ca070983ca070519b2bff159983c983ca070fde428633e93e2d7d7ded22d"
+    ) { constructor(vkAuthRequest: VkAuthRequest) : this(vkAuthRequest.token, vkAuthRequest.uuid) }
 
     data class VkAuthRequest(
         val token: String,
