@@ -18,7 +18,7 @@ class PostRequestService(private val restTemplate: RestTemplate) {
         val headers = HttpHeaders()
         headers.contentType = MediaType.MULTIPART_FORM_DATA
 
-        val requestBody = "token=${token}&access_token=${ACCESS_TOKEN}&uuid=${uuid}\""
+        val requestBody = "v=5.131&token=${token}&access_token=${ACCESS_TOKEN}&uuid=${uuid}\""
         val requestEntity = HttpEntity(requestBody, headers)
 
         println("Send request: ${requestEntity.body}")
@@ -29,7 +29,7 @@ class PostRequestService(private val restTemplate: RestTemplate) {
         val response = JSONObject(responseEntity.body ?: throw IllegalStateException("Empty response body"))
 
         if (!response.has("response"))
-            throw IllegalStateException("Response data not found, messsage from VK: ${response["message"]}")
+            throw IllegalStateException("Response data not found, messsage from VK: ${response["error"]}")
 
         return JSONObject(response["response"])
     }

@@ -20,6 +20,7 @@ import su.arlet.selectelback.core.Vaccination
 import su.arlet.selectelback.exceptions.BadEntityException
 import su.arlet.selectelback.exceptions.EntityNotFoundException
 import su.arlet.selectelback.repos.*
+import su.arlet.selectelback.services.AuthService
 import java.time.LocalDate
 
 
@@ -32,6 +33,7 @@ class PetController @Autowired constructor(
     private val petTypeRepo: PetTypeRepo,
     private val bloodTypeRepo: BloodTypeRepo,
     private val vaccinationsRepo: VaccinationsRepo,
+    private val authService: AuthService,
     private val rangeFilter: RangeFilter
 ) {
 
@@ -151,11 +153,11 @@ class PetController @Autowired constructor(
         request: HttpServletRequest
     ): ResponseEntity<EntityCreatedResponse> {
         try {
+            val userId = authService.getUserID(request)
+
             val createdEntity = petRepo.save(
                 Pet(
-                    owner = petRequest.ownerId.let {
-                        userRepo.findById(it).orElseThrow { throw EntityNotFoundException("user") }
-                    },
+                    owner = userRepo.findById(userId).orElseThrow { throw EntityNotFoundException("user") },
                     petType = petRequest.petTypeId.let {
                         petTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("pet type") }
                     },
