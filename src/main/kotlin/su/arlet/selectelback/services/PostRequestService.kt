@@ -7,7 +7,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import su.arlet.selectelback.controllers.AuthController
 
 @Component
 class PostRequestService(private val restTemplate: RestTemplate) {

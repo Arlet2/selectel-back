@@ -68,7 +68,8 @@ class DonorRequestController @Autowired constructor(
         val user = userRepo.findById(userID).getOrNull() ?: throw EntityNotFoundException("user")
 
         if ((!user.emailVisibility || user.email == null) && (!user.phoneVisibility || user.phone == null) &&
-            user.vkUserName == null && user.tgUserName == null)
+            user.vkUserName == null && user.tgUserName == null
+        )
             return ResponseEntity("Нельзя создать заявку без контактных данных", HttpStatus.CONFLICT)
 
         if (dateBefore != null && dateAfter == null || dateBefore == null && dateAfter != null) {

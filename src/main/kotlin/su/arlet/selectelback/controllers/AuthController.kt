@@ -10,8 +10,6 @@ import jakarta.servlet.http.HttpServletRequest
 import lombok.EqualsAndHashCode
 import lombok.Getter
 import lombok.Setter
-import org.json.JSONObject
-import org.json.JSONPropertyName
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -23,11 +21,10 @@ import su.arlet.selectelback.core.User
 import su.arlet.selectelback.exceptions.IncorrectPasswordError
 import su.arlet.selectelback.exceptions.UnauthorizedError
 import su.arlet.selectelback.exceptions.UserExistsError
-import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.exceptions.UserNotFoundError
+import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.services.AuthService
 import su.arlet.selectelback.services.PostRequestService
-import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -35,10 +32,10 @@ import java.time.LocalDateTime
 @RequestMapping(value = ["\${api.path}/auth"])
 @Tag(name = "Auth API")
 class AuthController @Autowired constructor(
-        private val userRepository: UserRepo,
-        private val authService: AuthService,
-        private val postRequestService: PostRequestService
-    ){
+    private val userRepository: UserRepo,
+    private val authService: AuthService,
+    private val postRequestService: PostRequestService
+) {
     data class UserLoginRequest(
         val login: String,
         val password: String,

@@ -17,12 +17,10 @@ import su.arlet.selectelback.exceptions.UserExistsError
 import su.arlet.selectelback.exceptions.UserNotFoundError
 import su.arlet.selectelback.repos.TokenRepo
 import su.arlet.selectelback.repos.UserRepo
-import java.security.SecureRandom
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
-import javax.crypto.SecretKey
 
 
 @Component
@@ -31,7 +29,8 @@ class AuthService @Autowired constructor(
     private val userRepo: UserRepo,
 ) {
     private val PASSWORD_HASH_COST = 12
-    private val key = Keys.hmacShaKeyFor(Decoders.BASE64.decode("qwerty1234567aAbada241312dfabasdjfajoifdasighiaiu249812y31hrkqh1k4jh12ued8c7hjkfjkagh782h4faiufhq87hq8aghq172h8hfaw87fgha8gha78rqufhq972h41uihdq87w6gf1wr1h872rh8f7h172rh872rh1f2"));
+    private val key =
+        Keys.hmacShaKeyFor(Decoders.BASE64.decode("qwerty1234567aAbada241312dfabasdjfajoifdasighiaiu249812y31hrkqh1k4jh12ued8c7hjkfjkagh782h4faiufhq87hq8aghq172h8hfaw87fgha8gha78rqufhq972h41uihdq87w6gf1wr1h872rh8f7h172rh872rh1f2"));
 
     fun getAccessToken(request: HttpServletRequest): String {
         return request.getHeader("Authorization").replace("bearer ", "", true) // todo: fix it
@@ -133,15 +132,17 @@ class AuthService @Autowired constructor(
         return createTokenById(user.id)
     }
 
-    fun createTokenById(userId: Long) : Pair<String, String> {
+    fun createTokenById(userId: Long): Pair<String, String> {
         val accessToken = createAccessToken(userId)
         val refreshToken = createRefreshToken(userId)
 
-        tokenRepo.save(Tokens(
-            userID = userId,
-            accessToken = accessToken,
-            refreshToken = refreshToken,
-        ))
+        tokenRepo.save(
+            Tokens(
+                userID = userId,
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+            )
+        )
 
         return Pair(accessToken, refreshToken)
     }

@@ -33,7 +33,7 @@ class WebConfig : WebMvcConfigurer {
         val urls = arrayOf("https://api.petdonor.ru", "http://localhost:8080")
         val servers = mutableListOf<Server>()
 
-        var server : Server
+        var server: Server
         for (url in urls) {
             server = Server()
             server.url = url
