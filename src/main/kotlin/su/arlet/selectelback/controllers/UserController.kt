@@ -2,20 +2,16 @@ package su.arlet.selectelback.controllers
 
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
-import su.arlet.selectelback.controllers.filters.RangeFilter
 import su.arlet.selectelback.controllers.responses.PetResponse
 import su.arlet.selectelback.controllers.responses.UserResponse
 import su.arlet.selectelback.core.*
 import su.arlet.selectelback.exceptions.EntityNotFoundException
-import su.arlet.selectelback.repos.BloodTypeRepo
 import su.arlet.selectelback.repos.LocationRepo
 import su.arlet.selectelback.repos.PetRepo
 import su.arlet.selectelback.repos.UserRepo
@@ -94,7 +90,7 @@ class UserController @Autowired constructor(
         return ResponseEntity.ok(UserResponse(user))
     }
 
-    @PostMapping("/changePass")
+    @PostMapping("/change_password")
     @Operation(summary = "Change password")
     @ApiResponse(responseCode = "200", description = "Success - password changed")
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
@@ -129,6 +125,32 @@ class UserController @Autowired constructor(
         updatedUser.phoneVisibility?.let { user.phoneVisibility = it }
     }
 
+    @PostMapping("/avatar")
+    @Operation(summary = "Upload avatar")
+    @ApiResponse(responseCode = "200", description = "Success - avatar uploaded")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
+    fun uploadAvatarFile(@RequestBody file: MultipartFile): Any? {
+        val resJsonData = JSONObject()
+        try {
+            if (file.isEmpty) {
+                println("Empty")
+            }
+
+            Files.copy(file.inputStream, p.resolve(file.originalFilename))
+
+            resJsonData.put("status", 200)
+            resJsonData.put("message", "Success!")
+            resJsonData.put("data", file.originalFilename)
+        } catch (e: Exception) {
+            println(e.message)
+            resJsonData.put("status", 400)
+            resJsonData.put("message", "Upload Image Error!")
+            resJsonData.put("data", "")
+        }
+        return resJsonData.toString()
+    }
     data class UpdateUserRequest (
         val phone : String?,
         val surname: String?,
