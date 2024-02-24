@@ -2,23 +2,23 @@ package su.arlet.selectelback.controllers
 
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
+import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
-import su.arlet.selectelback.controllers.filters.RangeFilter
 import su.arlet.selectelback.controllers.responses.UserResponse
+import org.springframework.web.multipart.MultipartFile
 import su.arlet.selectelback.core.*
 import su.arlet.selectelback.exceptions.EntityNotFoundException
-import su.arlet.selectelback.repos.BloodTypeRepo
 import su.arlet.selectelback.repos.LocationRepo
 import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.services.AuthService
-
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 
 
 @RestController
@@ -29,6 +29,9 @@ class UserController @Autowired constructor(
     private val locationRepository: LocationRepo,
     private val authService: AuthService
 ) {
+
+    private val p: Path =
+        Paths.get("/images")
 
     @GetMapping("/")
     @Operation(summary = "Get user info")
@@ -106,6 +109,33 @@ class UserController @Autowired constructor(
         updatedUser.tgUserName?.let { user.tgUserName = it }
         updatedUser.emailVisibility?.let { user.emailVisibility = it }
         updatedUser.phoneVisibility?.let { user.phoneVisibility = it }
+    }
+
+    @GetMapping("/avatar")
+    @Operation(summary = "Upload avatar")
+    @ApiResponse(responseCode = "200", description = "Success - avatar uploaded")
+    @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
+    @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
+    @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
+    fun uploadAvatarFile(@RequestParam("uploadfile") uploadfile: MultipartFile): Any? {
+        val resJsonData: JSONObject = JSONObject()
+        try {
+            if (uploadfile.isEmpty) {
+                println("Empty")
+            }
+
+            Files.copy(uploadfile.inputStream, p.resolve(uploadfile.originalFilename))
+
+            resJsonData.put("status", 200)
+            resJsonData.put("message", "Success!")
+            resJsonData.put("data", uploadfile.originalFilename)
+        } catch (e: Exception) {
+            println(e.message)
+            resJsonData.put("status", 400)
+            resJsonData.put("message", "Upload Image Error!")
+            resJsonData.put("data", "")
+        }
+        return resJsonData.toString()
     }
 
     data class UpdateUserRequest (

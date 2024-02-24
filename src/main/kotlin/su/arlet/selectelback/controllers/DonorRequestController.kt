@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.client.HttpClientErrorException.BadRequest
 import su.arlet.selectelback.controllers.filters.RangeFilter
 import su.arlet.selectelback.controllers.responses.EntityCreatedResponse
 import su.arlet.selectelback.core.BloodType
@@ -98,13 +99,20 @@ class DonorRequestController @Autowired constructor (
         try {
             val createdEntity = donorRequestRepo.save(
                 DonorRequest(
-                    user = userRepo.findById(userID).getOrNull() ?: throw EntityNotFoundException("user"),
-                    description = createDonorRequest.description ?: throw EntityNotFoundException("description"),
-                    vetAddress = createDonorRequest.vetAddress ?: throw EntityNotFoundException("vet address"),
-                    petType = petTypeRepo.findById(createDonorRequest.petTypeID).getOrNull() ?: throw EntityNotFoundException("pet type"),
-                    bloodType = bloodTypeRepo.findById(userID).getOrNull() ?: throw EntityNotFoundException("blood type"),
-                    bloodAmountMl = createDonorRequest.bloodAmountMl ?: throw EntityNotFoundException("blood amount ml"),
-                    availableUntil = createDonorRequest.availableUntil ?: throw EntityNotFoundException("available until"),
+                    user = userRepo.findById(userID).getOrNull() ?:
+                        return ResponseEntity("user not found", HttpStatus.NOT_FOUND),
+                    description = createDonorRequest.description ?:
+                        return ResponseEntity("description missing", HttpStatus.BAD_REQUEST),
+                    vetAddress = createDonorRequest.vetAddress ?:
+                        return ResponseEntity("vet address missing", HttpStatus.BAD_REQUEST),
+                    petType = petTypeRepo.findById(createDonorRequest.petTypeID).getOrNull() ?:
+                        return ResponseEntity("pet type ID missing", HttpStatus.BAD_REQUEST),
+                    bloodType = bloodTypeRepo.findById(userID).getOrNull() ?:
+                        return ResponseEntity("blood type ID missing", HttpStatus.NOT_FOUND),
+                    bloodAmountMl = createDonorRequest.bloodAmountMl ?:
+                        return ResponseEntity("blood amount ml missing", HttpStatus.BAD_REQUEST),
+                    availableUntil = createDonorRequest.availableUntil ?:
+                        return ResponseEntity("available until missing", HttpStatus.BAD_REQUEST),
                 )
             )
 

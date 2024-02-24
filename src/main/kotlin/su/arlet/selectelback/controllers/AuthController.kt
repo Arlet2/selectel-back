@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import su.arlet.selectelback.exceptions.IncorrectPasswordError
 import su.arlet.selectelback.exceptions.UnauthorizedError
 import su.arlet.selectelback.exceptions.UserExistsError
 import su.arlet.selectelback.services.AuthService
@@ -38,6 +39,8 @@ class AuthController @Autowired constructor(
         val accessToken: String,
         val refreshToken: String,
     )
+
+    data class Error(val error: String)
 
     @Setter
     @Getter
@@ -66,8 +69,12 @@ class AuthController @Autowired constructor(
         ]
     )
     @PostMapping(value = ["/login"])
-    fun login(@RequestBody(required = true) loginEntity: UserLoginRequest): ResponseEntity<AuthResponse> {
-        val (accessToken, refreshToken) = authService.login(loginEntity.login, loginEntity.password)
+    fun login(@RequestBody(required = true) loginEntity: UserLoginRequest): ResponseEntity<*> {
+        val (accessToken, refreshToken) = try {
+            authService.login(loginEntity.login, loginEntity.password)
+        } catch (e : IncorrectPasswordError) {
+            return ResponseEntity(Error(error = "неправильный логин или пароль"), HttpStatus.CONFLICT)
+        }
         return ResponseEntity(AuthResponse(accessToken, refreshToken), HttpStatus.OK)
     }
 
