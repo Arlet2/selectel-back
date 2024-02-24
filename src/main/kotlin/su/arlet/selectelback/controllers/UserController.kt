@@ -156,7 +156,17 @@ class UserController @Autowired constructor(
                 println("Empty")
             }
 
-            val path = Path(staticFilesPath.pathString, imageService.hashFilename(file.name)).toAbsolutePath()
+            val lastDotIndex = file.originalFilename?.lastIndexOf('.') ?: 0
+            val extension = if (lastDotIndex > 0) {
+                file.originalFilename?.substring(lastDotIndex)
+            } else {
+                null
+            }
+
+            if (extension == null) {
+                return ResponseEntity("no extension on file", HttpStatus.BAD_REQUEST)
+            }
+            val path = Path(staticFilesPath.pathString, imageService.hashFilename(file.name)+extension).toAbsolutePath()
 
             // todo: if file exists
             Files.copy(file.inputStream, path)
