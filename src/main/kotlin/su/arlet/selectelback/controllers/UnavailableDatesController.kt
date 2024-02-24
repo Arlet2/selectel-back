@@ -35,7 +35,9 @@ class UnavailableDatesController @Autowired constructor(
 
     @GetMapping("/")
     @Operation(summary = "Get unavailable dates")
-    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "200", description = "OK", content = [
+        Content(schema = Schema(implementation = UnavailableDates::class))],
+        )
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun getUnavailableDates(
@@ -69,7 +71,7 @@ class UnavailableDatesController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found (incorrect ids)", content = [Content()])
-    fun createDonorRequest(
+    fun createUnavailableDates(
         request: HttpServletRequest,
         @RequestBody unavailableDatesRequest: UnavailableDatesRequest
     ): ResponseEntity<*> {

@@ -134,13 +134,13 @@ class UserController @Autowired constructor(
         updatedUser.phoneVisibility?.let { user.phoneVisibility = it }
     }
 
-    @PostMapping("/avatar")
+    @PostMapping("/avatar", consumes = ["multipart/byteranges"])
     @Operation(summary = "Upload avatar")
     @ApiResponse(responseCode = "200", description = "Success - avatar uploaded")
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    fun uploadAvatarFile(@RequestParam file: MultipartFile): Any? {
+    fun uploadAvatarFile(@RequestParam("file") file: MultipartFile): Any? {
         val resJsonData = JSONObject()
         try {
             if (file.isEmpty) {
