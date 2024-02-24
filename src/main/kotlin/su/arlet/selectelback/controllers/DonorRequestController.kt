@@ -107,7 +107,7 @@ class DonorRequestController @Autowired constructor (
                         return ResponseEntity("vet address missing", HttpStatus.BAD_REQUEST),
                     petType = petTypeRepo.findById(createDonorRequest.petTypeID).getOrNull() ?:
                         return ResponseEntity("pet type ID missing", HttpStatus.BAD_REQUEST),
-                    bloodType = bloodTypeRepo.findById(userID).getOrNull() ?:
+                    bloodType = bloodTypeRepo.findById(createDonorRequest.bloodTypeID).getOrNull() ?:
                         return ResponseEntity("blood type ID missing", HttpStatus.NOT_FOUND),
                     bloodAmountMl = createDonorRequest.bloodAmountMl ?:
                         return ResponseEntity("blood amount ml missing", HttpStatus.BAD_REQUEST),
