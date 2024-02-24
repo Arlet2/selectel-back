@@ -10,3 +10,5 @@ FROM openjdk:21
 COPY --from=build /app/build/libs/selectel-back-0.0.1-rolling.jar /
 
 CMD java -jar selectel-back-0.0.1-rolling.jar
+
+VOLUME static
