@@ -225,7 +225,8 @@ class DonorRequestController @Autowired constructor(
     private fun updateDonorRequest(donorRequest: DonorRequest, updateDonorRequest: UpdateDonorRequest) {
         updateDonorRequest.description?.let { donorRequest.description = it }
         updateDonorRequest.vetAddress?.let { donorRequest.vetAddress = it }
-        updateDonorRequest.bloodType?.let { donorRequest.bloodType = it }
+        updateDonorRequest.bloodTypeID?.let { donorRequest.bloodType = bloodTypeRepo.findById(it).orElseThrow{ throw EntityNotFoundException("blood type")} }
+        updateDonorRequest.petTypeID?.let { donorRequest.petType = petTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("pet type") } }
         updateDonorRequest.bloodAmountMl?.let { donorRequest.bloodAmountMl = it }
         updateDonorRequest.availableUntil?.let { donorRequest.availableUntil = it }
     }
@@ -242,7 +243,8 @@ class DonorRequestController @Autowired constructor(
     data class UpdateDonorRequest(
         var description: String? = null,
         var vetAddress: String? = null,
-        var bloodType: BloodType? = null,
+        var bloodTypeID: Long? = null,
+        var petTypeID: Long? = null,
         var bloodAmountMl: Double? = null,
         var availableUntil: LocalDate? = null,
     )
