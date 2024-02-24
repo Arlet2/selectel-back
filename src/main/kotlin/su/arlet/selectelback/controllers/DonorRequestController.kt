@@ -17,6 +17,7 @@ import su.arlet.selectelback.core.BloodType
 import su.arlet.selectelback.core.DonorRequest
 import su.arlet.selectelback.exceptions.BadEntityException
 import su.arlet.selectelback.exceptions.EntityNotFoundException
+import su.arlet.selectelback.repos.BloodTypeRepo
 import su.arlet.selectelback.repos.DonorRequestRepo
 import su.arlet.selectelback.repos.PetTypeRepo
 import su.arlet.selectelback.repos.UserRepo
@@ -33,6 +34,7 @@ class DonorRequestController @Autowired constructor (
     private val authService: AuthService,
     private val userRepo: UserRepo,
     private val petTypeRepo: PetTypeRepo,
+    private val bloodTypeRepo: BloodTypeRepo,
 ){
 
     @GetMapping("/")
@@ -40,19 +42,29 @@ class DonorRequestController @Autowired constructor (
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
-    fun getPets(
+    fun getDonorRequests(
         request: HttpServletRequest,
         @RequestParam(name = "me", required = false) isMyRequests: Boolean?,
-    ): List<DonorRequest> {
+        @RequestParam(name = "date_before", required = false) dateBefore: LocalDate?,
+        @RequestParam(name = "date_after", required = false) dateAfter : LocalDate?,
+    ): ResponseEntity<*> {
         val userID = authService.getUserID(request)
 
-        return donorRequestRepo.findAll().toList().filter {
+        if (dateBefore != null && dateAfter == null || dateBefore == null && dateAfter != null) {
+            return ResponseEntity("only range is possible", HttpStatus.BAD_REQUEST)
+        }
+
+        val donorRequests = donorRequestRepo.findAll().toList().filter {
             if (isMyRequests == true) { // not null and true meaning
                 return@filter it.user.id == userID
             }
 
+
+
             return@filter true
         }
+
+        return ResponseEntity(donorRequests, HttpStatus.OK)
     }
 
     @PostMapping("/")
@@ -75,7 +87,7 @@ class DonorRequestController @Autowired constructor (
                     description = createDonorRequest.description ?: throw EntityNotFoundException("description"),
                     vetAddress = createDonorRequest.vetAddress ?: throw EntityNotFoundException("vet address"),
                     petType = petTypeRepo.findById(createDonorRequest.petTypeID).getOrNull() ?: throw EntityNotFoundException("pet type"),
-                    bloodType = createDonorRequest.bloodType ?: throw EntityNotFoundException("blood type"),
+                    bloodType = bloodTypeRepo.findById(userID).getOrNull() ?: throw EntityNotFoundException("blood type"),
                     bloodAmountMl = createDonorRequest.bloodAmountMl ?: throw EntityNotFoundException("blood amount ml"),
                     availableUntil = createDonorRequest.availableUntil ?: throw EntityNotFoundException("available until"),
                 )
@@ -139,7 +151,7 @@ class DonorRequestController @Autowired constructor (
         var description: String?,
         var vetAddress: String?,
         var petTypeID: Long,
-        var bloodType: BloodType?,
+        var bloodTypeID: Long,
         var bloodAmountMl : Double?,
         var availableUntil: LocalDate?,
     )
