@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest
 import lombok.EqualsAndHashCode
 import lombok.Getter
 import lombok.Setter
+import org.json.JSONException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,11 +18,13 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import su.arlet.selectelback.core.Location
 import su.arlet.selectelback.core.User
 import su.arlet.selectelback.exceptions.IncorrectPasswordError
 import su.arlet.selectelback.exceptions.UnauthorizedError
 import su.arlet.selectelback.exceptions.UserExistsError
 import su.arlet.selectelback.exceptions.UserNotFoundError
+import su.arlet.selectelback.repos.LocationRepo
 import su.arlet.selectelback.repos.UserRepo
 import su.arlet.selectelback.services.AuthService
 import su.arlet.selectelback.services.PostRequestService
@@ -33,6 +36,7 @@ import java.time.LocalDateTime
 @Tag(name = "Auth API")
 class AuthController @Autowired constructor(
     private val userRepository: UserRepo,
+    private val locationRepo: LocationRepo,
     private val authService: AuthService,
     private val postRequestService: PostRequestService
 ) {
@@ -197,7 +201,7 @@ class AuthController @Autowired constructor(
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun loginVk(@RequestBody(required = true) vkAuthRequest: VkAuthRequest): ResponseEntity<*> {
         val response = try {
-            postRequestService.sendVkPostRequest(
+            postRequestService.approveVkLogin(
                 token = vkAuthRequest.token, uuid = vkAuthRequest.uuid
             )
         } catch (_: IllegalStateException) {
@@ -209,9 +213,28 @@ class AuthController @Autowired constructor(
         val user: User = if (userRepository.existsUserByVkUserId(vkUserId)) {
             userRepository.getUserByVkUserId(vkUserId)
         } else {
+            val userInfo = try {
+                postRequestService.getUserInfo(
+                    userToken = response["access_token"].toString(), vkUserId = vkUserId
+                )
+            } catch (_: IllegalStateException) { null }
+
+            val location: Location? = userInfo?.let {
+                try {
+                    val city = it.getJSONObject("city").getString("title")
+
+                    if (locationRepo.existsLocationByCity(city))
+                        locationRepo.getLocationByCityAndDistrictIsNull(city)
+                    else null
+                } catch (_: JSONException) { null }
+            }
+
             val userLogin = "vk_${vkUserId}"
             val user = User(
                 login = userLogin,
+                name = userInfo?.getString("first_name"),
+                surname = userInfo?.getString("last_name"),
+                location = location,
                 created = LocalDate.now(),
                 lastActive = LocalDateTime.now(),
                 vkUserId = vkUserId,

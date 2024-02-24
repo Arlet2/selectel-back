@@ -124,7 +124,7 @@ class UserController @Autowired constructor(
         updatedUser.phone?.let { user.phone = it }
         updatedUser.surname?.let { user.surname = it }
         updatedUser.name?.let { user.name = it }
-        updatedUser.lastName?.let { user.middleName = it }
+        updatedUser.middleName?.let { user.middleName = it }
         updatedUser.locationId?.let {
             user.location = locationRepository.findById(it).orElseThrow { throw EntityNotFoundException("location") }
         }
@@ -166,7 +166,7 @@ class UserController @Autowired constructor(
         val phone: String?,
         val surname: String?,
         val name: String?,
-        val lastName: String?,
+        val middleName: String?,
         val locationId: Long?,
         val vkUserName: String?,
         val tgUserName: String?,
