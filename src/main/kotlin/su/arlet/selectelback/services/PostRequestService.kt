@@ -19,7 +19,7 @@ class PostRequestService(private val restTemplate: RestTemplate) {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
-        val requestBody = "v=5.131&token=${token}&access_token=${ACCESS_TOKEN}&uuid=${uuid}"
+        val requestBody = "v=5.199&token=${token}&access_token=${ACCESS_TOKEN}&uuid=${uuid}"
         val requestEntity = HttpEntity(requestBody, headers)
 
         val responseEntity = restTemplate.exchange(VK_APPROVE_URL, HttpMethod.POST, requestEntity, String::class.java)
@@ -36,7 +36,7 @@ class PostRequestService(private val restTemplate: RestTemplate) {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
-        val requestBody = "access_token=${userToken}&user_ids=${vkUserId}&fields=city"
+        val requestBody = "v=5.199&access_token=${userToken}&user_ids=${vkUserId}&fields=city"
         val requestEntity = HttpEntity(requestBody, headers)
 
         val responseEntity = restTemplate.exchange(VK_GET_INFO_URL, HttpMethod.POST, requestEntity, String::class.java)
