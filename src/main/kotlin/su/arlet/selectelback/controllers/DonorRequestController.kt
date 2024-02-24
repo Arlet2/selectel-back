@@ -68,12 +68,6 @@ class DonorRequestController @Autowired constructor(
         @RequestParam(name = "blood_type_id", required = false) bloodTypeID: Long?,
     ): ResponseEntity<*> {
         val userID = authService.getUserID(request)
-        val user = userRepo.findById(userID).getOrNull() ?: throw EntityNotFoundException("user")
-
-        if ((!user.emailVisibility || user.email == null) && (!user.phoneVisibility || user.phone == null) &&
-            user.vkUserName == null && user.tgUserName == null
-        )
-            return ResponseEntity("Нельзя создать заявку без контактных данных", HttpStatus.CONFLICT)
 
         val donorRequests = donorRequestRepo.findAll().toList().filter {
             if (isMyRequests != null) {
@@ -139,11 +133,19 @@ class DonorRequestController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found (incorrect ids)", content = [Content()])
+    @ApiResponse(responseCode = "409", description = "Not enough personal data", content = [Content()])
     fun createDonorRequest(
         request: HttpServletRequest,
         @RequestBody createDonorRequest: CreateDonorRequest
     ): ResponseEntity<*> {
         val userID = authService.getUserID(request)
+        val user = userRepo.findById(userID).getOrNull() ?: throw EntityNotFoundException("user")
+
+        if ((!user.emailVisibility || user.email == null) && (!user.phoneVisibility || user.phone == null) &&
+            user.vkUserName == null && user.tgUserName == null
+        )
+            return ResponseEntity("Нельзя создать заявку без контактных данных", HttpStatus.CONFLICT)
+
         try {
             val createdEntity = donorRequestRepo.save(
                 DonorRequest(
