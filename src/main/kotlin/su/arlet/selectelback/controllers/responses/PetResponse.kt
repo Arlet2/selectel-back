@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 class PetResponse(
     val id: Long,
-    var owner: UserResponse,
+    var owner: PetUserResponse,
     var petType: PetType,
     var bloodType: BloodType,
     var name: String,
@@ -17,7 +17,7 @@ class PetResponse(
 ) {
     constructor(pet: Pet) : this(
         pet.id,
-        UserResponse(pet.owner),
+        PetUserResponse(pet.owner),
         pet.petType,
         pet.bloodType,
         pet.name,

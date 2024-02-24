@@ -220,11 +220,7 @@ class AuthController @Autowired constructor(
             userRepository.save(user)
         }
 
-        println("Get user $user")
-
         val (accessToken, refreshToken) = authService.createTokenById(user.id)
-
-        println("Return login ${user.login} accessToken $accessToken")
 
         return ResponseEntity(VkAuthResponse(user.login, accessToken, refreshToken), HttpStatus.OK)
     }

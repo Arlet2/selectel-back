@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import su.arlet.selectelback.controllers.responses.PetResponse
+import su.arlet.selectelback.controllers.responses.PetUserResponse
 import su.arlet.selectelback.controllers.responses.UserResponse
 import su.arlet.selectelback.core.User
 import su.arlet.selectelback.exceptions.EntityNotFoundException
@@ -54,10 +55,10 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    fun getUserByLogin(@PathVariable login: String): ResponseEntity<UserResponse> {
+    fun getUserByLogin(@PathVariable login: String): ResponseEntity<PetUserResponse> {
         return if (userRepository.existsUserByLogin(login)) {
             val user = userRepository.getUserByLogin(login)
-            ResponseEntity.ok(UserResponse(user))
+            ResponseEntity.ok(PetUserResponse(user))
         } else ResponseEntity.notFound().build()
     }
 
