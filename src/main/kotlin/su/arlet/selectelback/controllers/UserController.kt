@@ -57,11 +57,16 @@ class UserController @Autowired constructor(
     @ApiResponse(responseCode = "401", description = "No token found", content = [Content()])
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     @ApiResponse(responseCode = "404", description = "Not found - user not found", content = [Content()])
-    fun getUserByLogin(@PathVariable login: String): ResponseEntity<PetUserResponse> {
+    fun getUserByLogin(@PathVariable login: String, request: HttpServletRequest): ResponseEntity<*> {
+        val id: Long = authService.getUserID(request)
+        val myUser = userRepository.findById(id).orElseThrow { throw EntityNotFoundException("user") }
+
+        if (myUser.login == login) return ResponseEntity.ok(UserResponse(myUser))
+
         return if (userRepository.existsUserByLogin(login)) {
             val user = userRepository.getUserByLogin(login)
             ResponseEntity.ok(PetUserResponse(user))
-        } else ResponseEntity.notFound().build()
+        } else ResponseEntity(null, HttpStatus.NOT_FOUND)
     }
 
     @GetMapping("/{login}/pets")
