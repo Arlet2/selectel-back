@@ -200,7 +200,7 @@ class AuthController @Autowired constructor(
     @ApiResponse(responseCode = "403", description = "Access Denied", content = [Content()])
     fun loginVk(@RequestBody(required = true) vkAuthRequest: VkAuthRequest): ResponseEntity<*> {
         // todo try catch
-        var response = postRequestService.sendPostRequest(VK_URL, VkAuthInfo(vkAuthRequest))
+        var response = postRequestService.sendPostRequest(VK_URL, getVkAuthInfo(vkAuthRequest))
         response = JSONObject(response["response"].toString())
 
         if (!response.has("user_id"))
@@ -226,11 +226,14 @@ class AuthController @Autowired constructor(
         return ResponseEntity(VkAuthResponse(user.login, accessToken, refreshToken), HttpStatus.OK)
     }
 
-    data class VkAuthInfo(
-        val token: String,
-        val uuid: String,
-        val access_token: String = "983ca070983ca070983ca070519b2bff159983c983ca070fde428633e93e2d7d7ded22d"
-    ) { constructor(vkAuthRequest: VkAuthRequest) : this(vkAuthRequest.token, vkAuthRequest.uuid)  }
+    fun getVkAuthInfo(vkAuthRequest: VkAuthRequest) : Map<String, String> {
+        val accessToken = "983ca070983ca070983ca070519b2bff159983c983ca070fde428633e93e2d7d7ded22d"
+        return mapOf(
+            vkAuthRequest.token to "token",
+            vkAuthRequest.uuid to "uuid",
+            accessToken to "access_token"
+        )
+    }
 
     data class VkAuthRequest(
         val token: String,
