@@ -292,8 +292,8 @@ class PetController @Autowired constructor(
     }
 
     private fun updatePetFields(pet: Pet, updatedPet: UpdatePetRequest) {
-        updatedPet.petType?.let { pet.petType = it }
-        updatedPet.bloodType?.let { pet.bloodType = it }
+        updatedPet.petTypeId?.let { pet.petType = petTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("petType") } }
+        updatedPet.bloodTypeId?.let { pet.bloodType = bloodTypeRepo.findById(it).orElseThrow { throw EntityNotFoundException("bloodType") } }
         updatedPet.name?.let { pet.name = it }
         updatedPet.description?.let { pet.description = it }
         updatedPet.birthday?.let { pet.birthday = it }
@@ -316,8 +316,8 @@ class PetController @Autowired constructor(
     )
 
     data class UpdatePetRequest(
-        val petType: PetType? = null,
-        val bloodType: BloodType? = null,
+        val petTypeId: Long? = null,
+        val bloodTypeId: Long? = null,
         val name: String? = null,
         val description: String? = null,
         val birthday: LocalDate? = null,
