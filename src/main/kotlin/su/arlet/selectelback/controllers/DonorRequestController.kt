@@ -65,6 +65,11 @@ class DonorRequestController @Autowired constructor(
         @RequestParam(name = "blood_type_id", required = false) bloodTypeID: Long?,
     ): ResponseEntity<*> {
         val userID = authService.getUserID(request)
+        val user = userRepo.findById(userID).getOrNull() ?: throw EntityNotFoundException("user")
+
+        if ((!user.emailVisibility || user.email == null) && (!user.phoneVisibility || user.phone == null) &&
+            user.vkUserName == null && user.tgUserName == null)
+            return ResponseEntity("Нельзя создать заявку без контактных данных", HttpStatus.CONFLICT)
 
         if (dateBefore != null && dateAfter == null || dateBefore == null && dateAfter != null) {
             return ResponseEntity("only range is possible", HttpStatus.BAD_REQUEST)

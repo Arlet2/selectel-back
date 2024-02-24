@@ -82,9 +82,9 @@ class AuthController @Autowired constructor(
         val (accessToken, refreshToken) = try {
             authService.login(loginEntity.login, loginEntity.password)
         } catch (e: IncorrectPasswordError) {
-            return ResponseEntity(Error(error = "неправильный логин или пароль"), HttpStatus.CONFLICT)
+            return ResponseEntity(Error(error = "Неправильный логин или пароль"), HttpStatus.CONFLICT)
         } catch (e: UserNotFoundError) {
-            return ResponseEntity(Error(error = "неправильный логин или пароль"), HttpStatus.CONFLICT)
+            return ResponseEntity(Error(error = "Неправильный логин или пароль"), HttpStatus.CONFLICT)
         }
         return ResponseEntity(AuthResponse(accessToken, refreshToken), HttpStatus.OK)
     }
@@ -127,7 +127,7 @@ class AuthController @Autowired constructor(
             )
         } catch (e: UserExistsError) {
             data class Error(val error: String)
-            return ResponseEntity(Error(error = "email или логин уже существует"), HttpStatus.CONFLICT)
+            return ResponseEntity(Error(error = "Email или логин уже существует"), HttpStatus.CONFLICT)
         }
         return ResponseEntity(AuthResponse(accessToken, refreshToken), HttpStatus.OK)
     }
