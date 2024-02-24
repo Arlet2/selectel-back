@@ -22,7 +22,7 @@ class WebConfig : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
             .allowedOrigins("http://localhost:3000", "https://petdonor.ru", "http://127.0.0.1:3000")
-            .allowedMethods("POST", "GET", "PUT", "DELETE")
+            .allowedMethods("POST", "GET", "PUT", "DELETE", "PATCH")
             .allowCredentials(true).maxAge(3600)
     }
 }

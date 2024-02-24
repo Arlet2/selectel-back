@@ -3,7 +3,6 @@ package su.arlet.selectelback.controllers
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
@@ -47,6 +46,9 @@ class DonorRequestController @Autowired constructor (
         @RequestParam(name = "me", required = false) isMyRequests: Boolean?,
         @RequestParam(name = "date_before", required = false) dateBefore: LocalDate?,
         @RequestParam(name = "date_after", required = false) dateAfter : LocalDate?,
+        @RequestParam(name = "location_id", required = false) locationID : Long?,
+        @RequestParam(name="pet_type_id", required = false) petTypeID: Long?,
+        @RequestParam(name="blood_type_id", required = false) bloodTypeID: Long?,
     ): ResponseEntity<*> {
         val userID = authService.getUserID(request)
 
@@ -59,7 +61,20 @@ class DonorRequestController @Autowired constructor (
                 return@filter it.user.id == userID
             }
 
+            if (dateBefore?.isBefore(it.availableUntil) != true)
+                return@filter false
 
+            if (dateAfter?.isAfter(it.availableUntil) != true)
+                return@filter false
+
+            if (!rangeFilter.equal(it.user.location?.id, locationID))
+                return@filter false
+
+            if (!rangeFilter.equal(it.petType.id, petTypeID))
+                return@filter false
+
+            if (!rangeFilter.equal(it.bloodType.id, bloodTypeID))
+                return@filter false
 
             return@filter true
         }
